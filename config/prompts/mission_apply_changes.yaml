@@ -1,0 +1,62 @@
+meta:
+  mission_id: "mission_apply_changes"
+  project_name: "AIHomeCoder V2 - Ecriture"
+  author: "Pre-Humain Directeur Adjoint"
+  version: "2.0.0"
+  description: |
+    Mission d'application des modifications.
+    Objectif : appliquer, consigner et ne jamais improviser les ecritures locales.
+  mode: "write_enabled"
+
+context:
+  environment: "local"
+  workspace: "${WORKSPACE_ROOT}"
+  mode: "write_enabled"
+  variables:
+    WRITE_PLAN: "plans/write_plan.yaml"
+    REPORT_LOG: "reports/write_execution.md"
+    DEFAULT_ENCODING: "utf-8"
+    CHANGE_POLICY: "guarded"
+  output:
+    destination: "${REPORT_LOG}"
+    format: "markdown"
+
+plan_spec:
+  description: |
+    Le plan YAML attendu doit contenir :
+      - `metadata`: informations sur l'auteur, la date et le contexte.
+      - `changes`: liste ordonnee d'operations a appliquer.
+    Chaque entree `changes` suit la structure :
+      - `file`: chemin relatif du fichier a modifier.
+      - `action`: `overwrite`, `replace_block`, `insert_before`, `insert_after` ou `append`.
+      - `content`: bloc de texte a ecrire (obligatoire sauf pour `append` avec `source`).
+      - `encoding`: optionnel, defaut `${DEFAULT_ENCODING}`.
+      - `selectors`: pour `replace_block` ou `insert_*`, precise `marker`, `before`, `after` ou `start`/`end`.
+      - `source`: optionnel, peut pointer vers un fichier externe dont le contenu remplace `content`.
+      - `notes`: rappel des decisions ou validations humaines.
+    Le plan peut inclure `dry_run: true` pour simuler sans ecriture.
+
+tasks:
+  - id: "apply_writes"
+    name: "Appliquer les modifications planifiees"
+    goal: "Decrire la logique, les parametres et les sorties de la mission d'ecriture."
+    task_type: "task_apply_writes"
+    parameters:
+      workspace: "${WORKSPACE_ROOT}"
+      plan_path: "${WRITE_PLAN}"
+      report_path: "${REPORT_LOG}"
+      default_encoding: "${DEFAULT_ENCODING}"
+      guardrail_policy: "${CHANGE_POLICY}"
+      output:
+        destination: "${REPORT_LOG}"
+        format: "markdown"
+
+outputs:
+  - destination: "${REPORT_LOG}"
+    format: "markdown"
+    status: "declared"
+
+post_actions:
+  - "Publier la synthese d'ecriture via ContextBridge."
+  - "Confirmer la traque des modifications appliquees."
+

@@ -1,0 +1,91 @@
+# ============================================================
+# 🔍 AIHomeCoder – Audit Pré-Intégration Claude
+# ============================================================
+# Fichier : missions/audit_pre_integration_claude.yalm
+# Auteur  : Pré-Humain Directeur Adjoint
+# Date    : 2025-10-31
+# Version : 1.0
+# But     : Vérifier la présence, la structure et la compatibilité
+#           des dossiers destinés à accueillir la mémoire Claude Code.
+# ============================================================
+
+mission:
+  name: "audit_pre_integration_claude"
+  description: >
+    Audit léger visant à confirmer que le système AIHomeCoder est prêt
+    à recevoir la mémoire Claude Code sans altérer la Clean Architecture.
+  author: "Pré-Humain Directeur Adjoint"
+  model: "qwen_local"
+  mode: "read_only"
+
+scope:
+  include:
+    - ./core/
+    - ./config/
+    - ./missions/
+  exclude:
+    - ./data/**
+    - ./logs/**
+    - ./reports/**
+  max_files: 200
+  max_file_size: 1MB
+
+steps:
+  - name: "check_core_knowledge_folder"
+    description: "Vérifie la présence du dossier core/knowledge et son contenu."
+    action: "analyze_directory"
+    target: "./core/knowledge"
+    expect:
+      required_files: ["CLAUDE.md", "claude-commands-guide.md", "settings.local.json"]
+      optional_files: ["claude_legacy.yaml"]
+
+  - name: "check_profiles"
+    description: "Vérifie la présence des profils nécessaires à l’intégration."
+    action: "analyze_yaml"
+    targets:
+      - ./config/profiles/default.yaml
+      - ./config/profiles/qwen_local.yaml
+      - ./config/profiles/deepseek_local.yaml
+
+  - name: "check_settings_and_guardrail"
+    description: "Valide la cohérence entre guardrail.py et settings.yaml."
+    action: "parse_python"
+    targets:
+      - ./core/guardrail.py
+      - ./core/settings.py
+
+  - name: "generate_preintegration_report"
+    description: "Synthétise les vérifications dans un rapport Markdown clair."
+    action: "write_file"
+    target: "./reports/audit_pre_integration_claude_{date}.md"
+    content: |
+      # 🧩 Audit Pré-Intégration – AIHomeCoder & Claude
+
+      **Date :** {date}  
+      **Mode :** Read-Only  
+      **Analyste :** Qwen Local  
+
+      ## Résumé
+      - Dossier mémoire : {knowledge_status}
+      - Profils : {profiles_status}
+      - Guardrail cohérent : {guardrail_status}
+
+      ## Détails
+      - `core/knowledge/` : {knowledge_details}
+      - Profils YAML : {profiles_list}
+      - Paramètres par défaut : {settings_mode}
+
+      ## Diagnostic
+      {diagnostic_summary}
+
+      ## Recommandations
+      - Si le dossier `core/knowledge/` est vide, exécuter `install_claude_legacy.yalm`.
+      - Si des fichiers sont manquants, les copier manuellement avant intégration.
+      - Rejouer `hello_claude_to_aihomecoder.yalm` après installation complète.
+
+      ## Statut final
+      {status_summary}
+
+# ============================================================
+# ✅ FIN DE MISSION
+# ============================================================

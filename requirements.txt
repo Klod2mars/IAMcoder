@@ -1,0 +1,19 @@
+# ===========================================================
+# AIHomeCoder - Requirements
+# ===========================================================
+
+# Core dependencies
+typer>=0.9.0
+pyyaml>=6.0.1
+gitpython>=3.1.40
+
+# Logging and UI
+loguru>=0.7.2
+rich>=13.7.0
+
+# Vector database (optional)
+chromadb>=0.4.22
+
+# Optional dependencies
+# textual>=0.57.0  # For TUI future
+# fastapi>=0.109.0  # For API extension

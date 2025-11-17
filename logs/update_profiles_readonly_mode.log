@@ -1,0 +1,8 @@
+2025-10-30T00:00:00Z START update_profiles_readonly_mode
+2025-10-30T00:00:00Z Updated config/profiles/qwen_local.yaml with modes block
+2025-10-30T00:00:00Z Updated config/profiles/deepseek_local.yaml with modes block
+2025-10-30T00:00:00Z Updated config/profiles/default.yaml with modes block
+2025-10-30T00:00:00Z Edited config/settings.yaml to set defaults.profile=qwen_local and defaults.mode=read_only
+2025-10-30T00:00:00Z Added enforce_task_restrictions to core/guardrail.py for read_only checks
+2025-10-30T00:00:00Z SUCCESS Profiles and guardrail updated for READ ONLY compliance
+

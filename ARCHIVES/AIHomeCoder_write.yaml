@@ -1,0 +1,49 @@
+# 🌱 Mission Vivante d'Écriture — Test de création de fichier
+# Auteur : Pré-Humain Directeur Adjoint
+# Date : 2025-11-02
+# Objectif : Vérifier que AIHomeCoder écrit un contenu réel à partir d’un fichier Markdown source
+
+meta:
+  mode: "WRITE_ENABLED"
+  workspace: "RTMBOX"
+  report_format: "markdown"
+  report_destination: "reports/write_test_report.md"
+  sanctuaire_hive: true
+  philosophy: "Écrire avec prudence, dans le respect du vivant et de la trace."
+
+context:
+  description: |
+    Cette mission teste la capacité du moteur à écrire un contenu fourni depuis un fichier Markdown externe.
+    Le but est de créer un nouveau fichier dans le dossier `docs/` du workspace RTMBOX et d’y écrire le contenu
+    de `write_source.md`.
+
+tasks:
+  - name: "task_apply_writes"
+    task_type: "task_apply_writes"
+    goal: "Écrire le contenu de write_source.md dans un nouveau fichier test_output.md"
+    description: "Création d’un fichier test_output.md contenant le texte de référence fourni par le Pré-Humain."
+    parameters:
+      plan:
+        changes:
+          - action: overwrite
+            target: "docs/test_output.md"
+            content_from: "write_source.md"
+      dry_run: false
+    expected_output: |
+      Le fichier docs/test_output.md doit être créé dans RTMBOX et contenir le texte issu de write_source.md.
+
+post_actions:
+  - action: "save_report"
+    destination: "reports/write_test_report.md"
+  - action: "log_session"
+    destination: "logs/session_write_test_{{timestamp}}.md"
+
+validation:
+  check_output_exists: "docs/test_output.md"
+  check_guardrail_breaches: false
+  check_output_not_empty: true
+
+signature:
+  author: "Pré-Humain Directeur Adjoint"
+  verified: true
+  message: "Cycle d’écriture RTMBOX — validation de l’écriture depuis une source Markdown externe"

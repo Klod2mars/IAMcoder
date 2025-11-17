@@ -1,0 +1,107 @@
+# ============================================================
+# 🧭 Mission Test – Lecture seule du workspace sélectionné (v2)
+# Objectif : Explorer la structure réelle du workspace et produire
+#             un rapport Markdown complet avec un mini "tree".
+# ============================================================
+
+meta:
+  project_name: "test_readonly_tree_scan_v2"
+  version: "2.0.0"
+  description: "Lecture du workspace externe (3 niveaux), génération d’un arbre et statistiques des extensions."
+  author: "Pré-Humain Directeur Adjoint"
+  model: "qwen2.5-coder:7b"
+  memory: "config/profiles/qwen_local.yaml"
+
+context:
+  environment: "ollama"
+  mode: "read_only_audit"
+  language: "fr"
+  output_format: "markdown"
+  philosophy: "Observer sans modifier, comprendre avant d’agir."
+  sanctuaire_hive: true
+
+tasks:
+  - name: "Sélection du dossier de travail"
+    goal: "Inviter l’utilisateur à choisir le dossier du projet à lire (ex : PermaCalendar V2)."
+    task_type: "setup"
+    parameters:
+      ask_user_path: true
+      variable_path: "external_workspace"
+      read_only_mode: true
+      log_all_actions: true
+
+  - name: "Exploration du workspace"
+    goal: "Parcourir la structure du workspace (3 niveaux) et recueillir les statistiques."
+    task_type: "analysis"
+    parameters:
+      workspace_path: "${external_workspace}"
+      depth: 3
+      include_ext:
+        - ".dart"
+        - ".py"
+        - ".json"
+        - ".yaml"
+        - ".md"
+      exclude_patterns:
+        - ".git/**"
+        - "build/**"
+        - "dist/**"
+        - "node_modules/**"
+        - "venv/**"
+      output_data: "data/tree_${external_workspace}.json"
+
+  - name: "Génération du rapport Markdown"
+    goal: "Créer un fichier Markdown avec : résumé, arbre, extensions, compte des fichiers."
+    task_type: "report_generation"
+    parameters:
+      format: "markdown"
+      destination: "reports/tree_readonly_${external_workspace}.md"
+      sections:
+        - "Résumé"
+        - "Arborescence (3 niveaux)"
+        - "Extensions détectées"
+        - "Horodatage et dossier source"
+      render_logic: |
+        # 🌳 Rapport de Lecture — ${external_workspace}
+        **Date** : {{ now }}
+        **Mode** : Lecture seule  
+        **Workspace** : ${external_workspace}
+
+        ---
+
+        ## Résumé
+        Lecture effectuée sur 3 niveaux de profondeur.  
+        Fichiers analysés : {{ file_count }}  
+        Dossiers parcourus : {{ folder_count }}
+
+        ---
+
+        ## Arborescence (3 niveaux)
+        {{ tree_structure }}
+
+        ---
+
+        ## Extensions détectées
+        {% for ext, count in extensions.items() %}
+        - **{{ ext }}** : {{ count }} fichier(s)
+        {% endfor %}
+
+        ---
+
+        _Rapport généré automatiquement par AIHomeCoder v1.0.0 — Mode lecture seule_
+
+outputs:
+  - format: "markdown"
+    destination: "reports/tree_readonly_${external_workspace}.md"
+  - format: "json"
+    destination: "data/tree_${external_workspace}.json"
+
+post_actions:
+  - "Validate that all output files exist."
+  - "Display the first 25 lines of the Markdown report in console."
+  - "Print confirmation message: '✅ Lecture complète terminée — rapport d’arborescence généré avec succès.'"
+
+intent:
+  - "Observer la structure réelle du workspace externe."
+  - "Lister les répertoires et fichiers sur 3 niveaux."
+  - "Créer un rapport Markdown lisible et informatif."

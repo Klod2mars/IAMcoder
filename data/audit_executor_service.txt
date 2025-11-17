@@ -1,0 +1,42 @@
+Audit de localisation — ExecutorService
+=======================================
+
+1. Références principales
+   - Fichier : `domain/services/executor_service.py`
+   - Classe : `ExecutorService`
+   - Importations clefs :
+     * `core.workspace_store.get_workspace_store`
+     * Entités `Mission`, `Task`, `MissionStatus`, `TaskStatus`
+
+2. Responsabilités fonctionnelles
+   - Orchestration séquentielle des tâches d’une mission via `execute_mission`.
+   - Gestion d’événements optionnels : `on_task_started`, `on_task_completed`, `on_task_failed`, `on_mission_completed`, `on_mission_failed`.
+   - Validation basique d’une mission (`validate_mission`) avant exécution.
+
+3. Points de contrôle dans `execute_mission`
+   - Passage en état `RUNNING` de la mission au démarrage.
+   - Récupération de `auto_run` depuis `WorkspaceStore` pour décider d’une demande de confirmation (`confirm_callback`).
+   - Boucle sur `mission.tasks` avec arrêt immédiat en cas d’annulation ou d’échec d’une tâche.
+   - Déclenchement des hooks mission (succès/échec) après la boucle ou en cas d’exception.
+
+4. Chaîne d’exécution des tâches
+   - `execute_mission` → `_execute_task` : mise à jour du statut tâche et déclenchement du hook `on_task_started`.
+   - `_execute_task` → `_execute_task_logic` : point central de la logique métier actuelle.
+   - `_execute_task_logic` délègue au registre `_handler_registry` selon `task.task_type`.
+
+5. Registre interne `_handler_registry`
+   - Types connus : `analysis`, `file_generation`, `file_patch`, `multi_file_patch`.
+   - Gestionnaires par défaut : méthodes internes retournant des chaînes “placeholder”.
+   - Cas par défaut : retourne `Task '<name>' executed successfully` si aucun handler n’est trouvé.
+
+6. Zones d’extension identifiées
+   - Substitution ou surcharge de `_execute_task_logic` pour injecter un moteur externe.
+   - Alimentation dynamique de `_handler_registry` pour supporter de nouveaux `task_type`.
+   - Exploitation des hooks pour publier des événements vers l’interface utilisateur ou un bus.
+
+7. Points de vigilance
+   - Toute exception non capturée dans `_execute_task_logic` est interceptée par `_execute_task` et transforme la tâche en `FAILED`.
+   - Les missions s’exécutent de façon strictement séquentielle ; aucune gestion de concurrence ou de rollback.
+   - Le flux dépend implicitement de `WorkspaceStore` pour la confirmation, ce qui impose de mocker ce composant lors des tests.
+
+

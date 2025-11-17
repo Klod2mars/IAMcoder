@@ -1,0 +1,172 @@
+# ===========================================================
+# 🧠 A I H O M E C O D E R 🧠
+# Version: 1.0.0
+# Auteur : Claude AI
+# Date : 2025-10-30
+# ===========================================================
+# Objectif :
+# Créer une application Python modulaire suivant Clean Architecture
+# servant d’exécuteur local de code et d’interprète de fichiers .YALM
+# pour exécuter des audits, refactors et diff locaux.
+# ===========================================================
+
+meta:
+  project_name: "aihomecoder"
+  architecture: "Clean Architecture (domain / data / presentation)"
+  language: "Python 3.10+"
+  description: >
+    aihomecoder est un moteur local de co-édition de code inspiré de Cursor,
+    utilisant un modèle IA local (Qwen ou DeepSeek) pour interpréter et appliquer
+    des missions .YALM, avec système de diff, rollback et logs Markdown.
+  author: "Claude AI"
+  version: "1.0.0"
+
+stack:
+  frameworks:
+    - typer          # CLI ergonomique
+    - pyyaml         # Lecture .yalm
+    - gitpython      # Sauvegarde & rollback
+    - difflib        # Génération des diffs
+    - chromadb       # Index vectoriel
+    - loguru         # Journaux
+    - rich           # Couleur & formatage terminal
+  optional:
+    - textual        # Interface TUI future
+    - fastapi        # Extension API éventuelle
+  ia_model:
+    engine: "ollama"
+    model_default: "qwen2-coder:7b-instruct"
+    alt_model: "deepseek-coder:6.7b"
+  environment:
+    min_python: "3.10"
+    os_compatible:
+      - linux
+      - macos
+      - windows
+
+security:
+  sanctuaire_protection:
+    ignore_paths:
+      - "data/hive_boxes/**"
+      - ".env"
+      - "private/**"
+      - ".git/**"
+  rollback: true
+
+# ===========================================================
+# 📦 STRUCTURE DU PROJET
+# ===========================================================
+structure:
+  - domain/
+  - data/
+  - presentation/
+  - core/
+  - config/
+  - logs/
+  - modules/
+  - tests/
+  - README.md
+  - .aihomecoderignore
+  - requirements.txt
+
+# ===========================================================
+# 🧩 DOMAIN LAYER
+# ===========================================================
+domain:
+  description: >
+    Contient la logique pure et les entités fondamentales :
+    - Task (une tâche issue du YAML)
+    - Mission (ensemble cohérent de tasks)
+    - DiffResult (résultat d’une comparaison de fichiers)
+  files:
+    - domain/entities/task.py
+    - domain/entities/mission.py
+    - domain/entities/diff_result.py
+    - domain/services/executor_service.py
+
+# ===========================================================
+# 🗃️ DATA LAYER
+# ===========================================================
+data:
+  description: >
+    Contient les modules de gestion de données, contexte et IA :
+    - yaml_parser : lecture & validation des fichiers .yalm
+    - diff_engine : création et application de patchs
+    - context_index : index vectoriel via ChromaDB
+    - ai_connector : interface avec Ollama
+  files:
+    - data/yaml_parser.py
+    - data/diff_engine.py
+    - data/context_index.py
+    - data/ai_connector.py
+
+# ===========================================================
+# 💬 PRESENTATION LAYER
+# ===========================================================
+presentation:
+  description: >
+    Interface CLI et affichage utilisateur :
+    - CLI principale
+    - gestion des logs & couleurs
+    - aperçu des diffs avant écriture
+  files:
+    - presentation/cli.py
+    - presentation/logger.py
+    - presentation/ui_diff_view.py
+
+# ===========================================================
+# 🔧 CORE & CONFIG
+# ===========================================================
+core:
+  description: >
+    Contient les utilitaires transverses :
+    - guardrail.py : protection des chemins sanctuaires
+    - file_manager.py : lecture/écriture sécurisée
+    - settings.py : paramètres globaux
+  files:
+    - core/guardrail.py
+    - core/file_manager.py
+    - core/settings.py
+
+config:
+  description: >
+    Contient la configuration de base et profils IA :
+  files:
+    - config/settings.yaml
+    - config/profiles/default.yaml
+    - config/profiles/qwen_local.yaml
+    - config/profiles/deepseek_local.yaml
+
+# ===========================================================
+# 🚀 TÂCHES DE CONSTRUCTION
+# ===========================================================
+tasks:
+  - name: "Créer structure Clean Architecture"
+    goal: "Générer toutes les couches domain, data, presentation, core"
+  - name: "Implémenter yaml_parser"
+    goal: "Lecture, validation et découpage des fichiers .yalm"
+  - name: "Implémenter diff_engine"
+    goal: "Création de patchs et rollback GitPython"
+  - name: "Implémenter context_index"
+    goal: "Indexation du code en embeddings ChromaDB"
+  - name: "Implémenter ai_connector"
+    goal: "Connexion locale à Ollama avec Qwen ou DeepSeek"
+  - name: "Implémenter CLI principale"
+    goal: "Commandes : run, audit, diff, log"
+  - name: "Intégrer guardrail & sécurité sanctuaire"
+    goal: "Empêcher la modification des zones critiques"
+  - name: "Créer fichiers de config par défaut"
+    goal: "Paramétrer le modèle IA, les chemins et les logs"
+  - name: "Rédiger README.md"
+    goal: "Documenter l’usage et la structure"
+
+# ===========================================================
+# 📄 FICHIERS À LIVRER
+# ===========================================================
+final_deliverable:
+  - "Projet Python complet respectant Clean Architecture"
+  - "CLI fonctionnelle : aihomecoder run <mission.yalm>"
+  - "README.md détaillé"
+  - "config/settings.yaml"
+  - "example_mission.yalm"
+  - "journal d’audit automatique (logs/session_*.md)"

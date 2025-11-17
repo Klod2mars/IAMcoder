@@ -1,0 +1,47 @@
+# ===========================================================
+# Profil Qwen Local
+# ===========================================================
+
+name: "qwen_local"
+description: "Configuration pour Qwen2 Coder local via Ollama"
+
+model:
+  name: "qwen2-coder:7b-instruct"
+  temperature: 0.6
+  max_tokens: 4000
+  top_p: 0.9
+
+prompts:
+  system: |
+    You are Qwen2-Coder, a code generation expert.
+    You excel at:
+    - Generating clean, efficient Python code
+    - Following PEP 8 and modern Python best practices
+    - Writing comprehensive docstrings and type hints
+    - Implementing clean architecture patterns
+    
+  code_generation: |
+    Generate production-ready Python code with:
+    - Type hints for all functions
+    - Comprehensive docstrings
+    - Error handling
+    - Unit tests when applicable
+    
+  refactoring: |
+    Refactor the code to:
+    - Improve readability and maintainability
+    - Reduce complexity
+    - Optimize performance
+    - Follow SOLID principles
+    
+modes:
+  read_only:
+    description: "Analysis, planning, and read-only operations. No file modifications."
+    allow_write: false
+    allow_delete: false
+    allow_move: false
+  write_enabled:
+    description: "Full edit capabilities except sanctuary paths enforcement."
+    allow_write: true
+    allow_delete: true
+    allow_move: true

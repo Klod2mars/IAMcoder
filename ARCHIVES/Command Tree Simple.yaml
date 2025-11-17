@@ -1,0 +1,50 @@
+meta:
+  project_name: "permacalendar_v2_audit"
+  author: "Pré-Humain Directeur Adjoint"
+  date: "2025-11-01"
+  goal: "Analyser la structure du projet Permacalendar V2 et générer un rapport Markdown du type tree."
+  mode: "read_only"
+  sanctuaire_hive: true
+
+context:
+  workspace: "./projects/permacalendar_v2"
+  output_format: "markdown"
+  variables:
+    - name: "SCAN_EXT"
+      value: ".dart"
+    - name: "REPORT_PATH"
+      value: "reports/audit_permacalendar_v2.md"
+
+tasks:
+  - id: "scan_structure"
+    goal: "Lire la structure des répertoires du projet et lister tous les fichiers Dart."
+    description: >
+      Exécute une fonction de type 'tree' : 
+      parcourt le dossier racine `./projects/permacalendar_v2`, 
+      affiche les sous-répertoires et les fichiers `.dart` détectés.
+      Aucun contenu de fichier n'est modifié.
+    output:
+      destination: "${REPORT_PATH}"
+      format: "markdown"
+
+  - id: "summarize_structure"
+    goal: "Synthétiser la structure du projet en Markdown"
+    description: >
+      Crée un rapport lisible avec sections : 
+      1. En-tête (meta, date, auteur)
+      2. Arborescence textuelle du dossier
+      3. Statistiques : nombre total de fichiers, nombre de fichiers `.dart`, profondeur moyenne
+      4. Liste des fichiers `.dart` par module
+    output:
+      destination: "${REPORT_PATH}"
+      format: "markdown"
+
+post_actions:
+  - "Afficher les 40 premières lignes du rapport dans la console."
+  - "Valider que reports/audit_permacalendar_v2.md existe."
+  - "Publier un diagnostic ContextBridge avec la durée du scan."
+
+intent:
+  - "Vérifier la capacité d'AIHomeCoder à lire et analyser une structure réelle."
+  - "Tester le respect du mode read_only pendant le parcours."
+  - "Confirmer la création automatique d'un rapport Markdown complet."

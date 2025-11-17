@@ -1,0 +1,71 @@
+# ===========================================================
+# AIHomeCoder Ignore Patterns
+# ===========================================================
+# Fichiers et répertoires à ignorer lors de l'indexation
+# et de l'analyse de code
+
+# Environnement virtuel
+venv/
+env/
+ENV/
+.venv/
+
+# Fichiers Python compilés
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Données et logs
+data/
+logs/
+*.log
+
+# Git
+.git/
+.gitignore
+
+# Environnement
+.env
+.env.local
+
+# Terraform et Infra (si applicable)
+.terraform/
+*.tfstate
+
+# Node modules (si projets mixtes)
+node_modules/
+package-lock.json
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# ChromaDB persistence
+chroma_db/
+chromadb/
+
+# Hive boxes (sanctuaire)
+data/hive_boxes/

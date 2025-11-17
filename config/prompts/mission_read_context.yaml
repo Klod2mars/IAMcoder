@@ -1,0 +1,51 @@
+meta:
+  mission_id: "mission_read_context"
+  project_name: "AIHomeCoder V2 - Lecture"
+  author: "Pre-Humain Directeur Adjoint"
+  version: "2.0.0"
+  description: |
+    Mission de lecture contextuelle.
+    Objectif : observer, filtrer et copier les elements utiles du workspace.
+  mode: "read_only"
+
+context:
+  environment: "local"
+  workspace: "${WORKSPACE_ROOT}"
+  mode: "read_only"
+  variables:
+    FOCUS_TERMS: "mission,roadmap,plan,readme,architecture,docs"
+    EXCLUDE_DIRS: "venv,__pycache__,.git,node_modules,.idea,.mypy_cache,.pytest_cache"
+    REPORT_NAME: "read_context.md"
+  output:
+    destination: "reports/${REPORT_NAME}"
+    format: "markdown"
+
+tasks:
+  - id: "gather_context"
+    name: "Collecter les documents de contexte"
+    goal: "Decrire la logique, les parametres et les sorties de la mission de lecture."
+    task_type: "task_gather_documents"
+    parameters:
+      workspace: "${WORKSPACE_ROOT}"
+      patterns:
+        - "${FOCUS_TERMS}"
+        - "mission"
+        - "plan"
+        - "architecture"
+        - "readme"
+        - "docs"
+      exclude_dirs: "${EXCLUDE_DIRS}"
+      destination: "reports/${REPORT_NAME}"
+      output:
+        destination: "reports/${REPORT_NAME}"
+        format: "markdown"
+
+outputs:
+  - destination: "reports/${REPORT_NAME}"
+    format: "markdown"
+    status: "declared"
+
+post_actions:
+  - "Publier les diagnostics de collecte via ContextBridge."
+  - "Confirmer la generation du rapport de lecture contextuelle."
+

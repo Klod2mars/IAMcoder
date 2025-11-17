@@ -1,0 +1,110 @@
+# ============================================================
+# 🔍 AIHomeCoder – Audit Préventif de Structure
+# ============================================================
+# Fichier : missions/audit_readonly_aihomecoder.yalm
+# Auteur  : Pré-Humain Directeur Adjoint
+# Date    : 2025-10-30
+# Version : 1.0
+# But     : Vérifier la cohérence structurelle et la propreté
+#           du projet AIHomeCoder avant intégration Claude Code.
+# ============================================================
+
+mission:
+  name: "audit_readonly_aihomecoder"
+  description: >
+    Audit rapide et non destructif du code AIHomeCoder.
+    Vérifie la conformité Clean Architecture, les dépendances
+    internes, les modules sensibles (guardrail, settings, file_manager)
+    et la clarté des profils de configuration.
+  author: "Pré-Humain Directeur Adjoint"
+  model: "qwen_local"
+  mode: "read_only"
+
+scope:
+  include:
+    - ./core/**/*.py
+    - ./config/**/*.yaml
+    - ./missions/**/*.yalm
+    - ./run_mission.py
+    - ./main.py
+  exclude:
+    - ./data/**
+    - ./logs/**
+    - ./reports/**
+    - ./exchange/**
+  max_files: 300
+  max_file_size: 1MB
+
+# ============================================================
+# 🧩 Étapes d'audit
+# ============================================================
+
+steps:
+  - name: "scan_structure"
+    description: "Lister les répertoires et modules principaux."
+    action: "analyze_directory_tree"
+
+  - name: "check_imports"
+    description: "Détecter les imports circulaires ou hors couche."
+    action: "scan_import_dependencies"
+    targets:
+      - ./core/
+      - ./domain/
+      - ./presentation/
+
+  - name: "analyze_guardrails"
+    description: "Vérifier la cohérence du fichier guardrail.py avec les modes de profil."
+    action: "parse_python"
+    target: ./core/guardrail.py
+    expect_keywords: ["enforce_task_restrictions", "read_only", "write"]
+
+  - name: "validate_profiles"
+    description: "Vérifier que les profils (default, qwen_local, deepseek_local) sont cohérents."
+    action: "analyze_yaml"
+    targets:
+      - ./config/profiles/*.yaml
+
+  - name: "detect_yalm_missions"
+    description: "Lister et valider la syntaxe des fichiers .yalm."
+    action: "parse_yaml_files"
+    targets:
+      - ./missions/
+
+  - name: "generate_report"
+    description: "Synthétiser l’analyse dans un rapport Markdown clair."
+    action: "write_file"
+    target: "./reports/audit_aihomecoder_structure_{date}.md"
+    content: |
+      # 🧩 Audit Structurel – AIHomeCoder
+
+      **Date :** {date}  
+      **Mode :** Read-Only  
+      **Analyste :** Qwen Local  
+
+      ## Résumé
+      - Répertoires audités : core/, config/, missions/
+      - Vérifications : imports, profils, guardrails, structure .yalm
+      - Statut général : ✅ Stable / ⚠️ Anomalies mineures / 🔴 Violations critiques
+
+      ## Points de vigilance
+      - Imports circulaires : {imports_detected}
+      - Profils incohérents : {profiles_issues}
+      - Guardrail incohérence : {guardrail_status}
+      - Missions invalides : {invalid_yalm_count}
+
+      ## Recommandations
+      1. Corriger les éventuels imports croisés entre core/domain.
+      2. Vérifier la cohérence entre mode par défaut et guardrail.
+      3. Simplifier les missions en double (si détectées).
+      4. Rejouer un audit complet après intégration Claude Legacy.
+
+      ## Prochaine étape
+      Lancer ensuite :
+      ```bash
+      python run_mission.py missions/install_claude_legacy.yalm
+      ```
+      pour greffer la mémoire Claude Code.
+
+# ============================================================
+# ✅ FIN DE MISSION
+# ============================================================

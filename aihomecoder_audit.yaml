@@ -1,0 +1,66 @@
+# ============================================================
+# 🧭 Mission Simple — Audit Permacalendar V2 (Lecture seule)
+# ============================================================
+
+meta:
+  project_name: "audit_simple_permacalendar"
+  version: "1.0.0"
+  description: "Mini-audit de structure pour tester le TaskLogicHandler dans un workspace externe."
+  author: "Pré-Humain Directeur Adjoint"
+  model: "qwen2.5-coder:7b"
+  memory: "config/profiles/qwen_local.yaml"
+
+context:
+  environment: "ollama"
+  mode: "read_only_audit"
+  language: "fr"
+  output_format: "markdown"
+  philosophy: "Observer la structure réelle du projet sans modification."
+  sanctuaire_hive: true
+
+tasks:
+  - name: "Sélection du workspace"
+    goal: "Confirmer le dossier du projet Permacalendar V2 à auditer."
+    task_type: "setup"
+    parameters:
+      ask_user_path: true
+      variable_path: "external_workspace"
+      read_only_mode: true
+      log_all_actions: true
+
+  - name: "Exploration des fichiers"
+    goal: "Parcourir la structure du projet sur 3 niveaux et générer des statistiques d’extensions."
+    task_type: "analysis"
+    parameters:
+      workspace_path: "${external_workspace}"
+      depth: 3
+      include_ext:
+        - ".dart"
+        - ".yaml"
+        - ".json"
+        - ".md"
+      output_data: "data/tree_permacalendar.json"
+
+  - name: "Création du rapport Markdown"
+    goal: "Générer un rapport simple avec le nombre de fichiers et un aperçu de la structure."
+    task_type: "report_generation"
+    parameters:
+      format: "markdown"
+      destination: "reports/audit_permacalendar_simple.md"
+      output_data: "data/tree_permacalendar.json"
+
+outputs:
+  - format: "markdown"
+    destination: "reports/audit_permacalendar_simple.md"
+  - format: "json"
+    destination: "data/tree_permacalendar.json"
+
+post_actions:
+  - "Validate that reports/audit_permacalendar_simple.md exists."
+  - "Display the first 20 lines of the Markdown report in console."
+  - "Print confirmation message: '✅ Audit simple du workspace terminé avec succès.'"
+
+intent:
+  - "Vérifier le bon fonctionnement du TaskLogicHandler."
+  - "Générer un rapport lisible avec au moins un contenu concret."
+  - "Tester la cohérence du flux entre lecture et écriture."

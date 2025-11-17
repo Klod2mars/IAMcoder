@@ -1,0 +1,14 @@
+# AIHomeCoder_Write_V2_Test.yaml
+name: "AIHomeCoder_Write_V2_Test"
+mode: write_enabled
+
+tasks:
+  - name: "task_apply_writes"
+    task_type: "task_apply_writes"
+    goal: "Copier RTMBOX/write_source.md vers RTMBOX/write_output.md (test GOAL + V2)"
+    parameters:
+      plan:
+        changes:
+          - action: overwrite
+            target: 'C:/Users/roman/Documents/apppklod/RTMBOX/write_output.md'
+            content_from: 'C:/Users/roman/Documents/apppklod/RTMBOX/write_source.md'

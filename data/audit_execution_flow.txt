@@ -1,0 +1,50 @@
+Cartographie du flux d’exécution
+================================
+
+Point de départ : `ExecutorService.execute_mission(mission, require_confirmation=False, confirmer=None)`
+
+Étapes détaillées :
+1. Initialisation mission
+   - `mission.status` ← `MissionStatus.RUNNING`.
+   - Lecture de `auto_run` via `core.workspace_store.get_workspace_store()`.
+   - Détermination du `confirmation_callback` (interaction utilisateur si `require_confirmation` et `auto_run` désactivé).
+
+2. Boucle sur chaque `task` de `mission.tasks`
+   - Si confirmation requise et refusée → `task.status` ← `CANCELLED`, `mission.status` ← `CANCELLED`, appel éventuel `on_mission_failed`, arrêt du flux.
+   - Sinon appel `_execute_task(task, mission)`.
+
+3. Détail de `_execute_task`
+   - `task.status` ← `TaskStatus.IN_PROGRESS`.
+   - Emission du hook `on_task_started` si défini.
+   - Bloc `try/except` enveloppant `_execute_task_logic` :
+     * Succès :
+       - `result` ← retour handler
+       - `task.status` ← `COMPLETED`
+       - Hook `on_task_completed`.
+       - Renvoie `True` à l’appelant.
+     * Exception :
+       - `task.status` ← `FAILED`
+       - `task.error` ← message d’exception
+       - Hook `on_task_failed`
+       - Renvoie `False`.
+
+4. Résultat mission
+   - Si une tâche renvoie `False` → `mission.status` ← `FAILED`, hook `on_mission_failed`, arrêt avec `False`.
+   - Toutes les tâches réussies → `mission.status` ← `COMPLETED`, hook `on_mission_completed`, retour `True`.
+   - Exception non gérée dans la boucle → catch global, `mission.status` ← `FAILED`, hook `on_mission_failed`, retour `False`.
+
+5. Logique interne `_execute_task_logic`
+   - Recherches dans `_handler_registry` sur `task.task_type`.
+   - Handlers existants :
+     * `analysis` → `_handle_analysis_task`
+     * `file_generation` → `_handle_file_generation_task`
+     * `file_patch` → `_handle_file_patch_task`
+     * `multi_file_patch` → `_handle_multi_file_patch_task`
+   - Si handler absent → message par défaut `Task '<name>' executed successfully`.
+
+Points d’interaction externes à surveiller pour un futur Task Logic Handler :
+- Injection ou surcharge de `_execute_task_logic` pour brancher la logique métier AI/outil.
+- Mise à jour dynamique de `_handler_registry` avant l’exécution de la mission.
+- Utilisation des hooks `on_*` pour propager l’état vers l’interface ou un orchestrateur supérieur.
+
+

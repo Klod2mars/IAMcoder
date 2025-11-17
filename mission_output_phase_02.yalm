@@ -1,0 +1,41 @@
+meta:
+  model: qwen2.5-coder:7b
+  memory: config/memory_local/qwen_memory.yalm
+  mission_id: output_phase_02
+  version: 1.1
+  description: >
+    Deuxième mission AIHomeCoder : produire effectivement les fichiers de sortie
+    (rapport Markdown + fichier d'échange LIALM) et exécuter les post-actions.
+    Cette mission valide la chaîne complète d'écriture locale.
+
+intent:
+  - Étendre l'exécution de mission pour inclure la génération des fichiers.
+  - Vérifier que les fichiers sont créés avec le bon contenu.
+  - Mettre à jour le log de mission avec un statut final "OK".
+
+context:
+  environment: ollama
+  language: English
+  mode: output_test
+  output_format: markdown
+  max_tokens: 2500
+
+tasks:
+  - "Implement file creation handlers for outputs (Markdown + LIALM)."
+  - "Write simulated report content into /reports/mission_test_output.md."
+  - "Write exchange summary into /exchange/qwen_to_deepseek_test.lialm."
+  - "Execute post_actions: validate files exist and preview Markdown."
+  - "Log all steps to /logs/mission_output_phase_02.log."
+
+outputs:
+  - format: markdown
+    destination: reports/mission_test_output.md
+  - format: lialm
+    destination: exchange/qwen_to_deepseek_test.lialm
+  - log: logs/mission_output_phase_02.log
+
+post_actions:
+  - Check file existence for all outputs.
+  - Display first 10 lines of the Markdown report.
+  - Print "Output phase successfully validated."
+

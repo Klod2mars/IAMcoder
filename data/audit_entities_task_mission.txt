@@ -1,0 +1,34 @@
+Audit des entités — Task & Mission
+==================================
+
+1. `Task` (`domain/entities/task.py`)
+   - Nature : dataclass représentant une action élémentaire.
+   - Champs principaux :
+     * `name` (str), `goal` (str) — obligatoires, validés dans `__post_init__`.
+     * `task_type` (str) — défaut `"generic"`, contrôle le handler choisi.
+     * `parameters` (dict) — configuration libre transmise au handler.
+     * `status` (`TaskStatus`) — énumération : `pending`, `in_progress`, `completed`, `failed`, `cancelled`.
+     * `result` (str|None), `error` (str|None) — retours d’exécution.
+   - Méthodes utilitaires : `to_dict()` pour la sérialisation, `from_dict()` pour la reconstruction avec conversion de statut.
+
+2. `Mission` (`domain/entities/mission.py`)
+   - Nature : dataclass regroupant un ensemble cohérent de tâches.
+   - Champs principaux :
+     * `name` (str) — requis, validation dans `__post_init__`.
+     * `description` (str) — contexte fonctionnel.
+     * `tasks` (List[`Task`]) — ordre séquentiel imposé.
+     * `status` (`MissionStatus`) — énumération : `pending`, `running`, `completed`, `failed`, `cancelled`.
+     * `metadata` (dict) — espace libre pour des extensions.
+   - Méthodes utilitaires :
+     * `add_task(task)` — append simple conservant l’ordre de déclaration.
+     * `get_task_by_name(name)` — recherche linéaire.
+     * `get_completed_tasks()`, `get_failed_tasks()` — filtrage par statut.
+     * `get_progress()` — pourcentage basé sur `TaskStatus.COMPLETED`.
+     * `to_dict()` / `from_dict()` — sérialisation avec reconstruction des tâches.
+
+3. Couplage Mission ↔ Task
+   - Les états de mission reflètent l’agrégation des états de tâches (progression calculée sur `COMPLETED`).
+   - L’orchestration est assurée par `domain.services.executor_service.ExecutorService`.
+   - Les entités n’embarquent aucune dépendance aux services : elles restent proches du domaine métier pur.
+
+

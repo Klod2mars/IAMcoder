@@ -1,0 +1,18 @@
+mission:
+  name: Génération de Command Tree
+  description: Explore la racine du projet et génère une vue simple de la structure (fichiers + dossiers) au format Markdown.
+  tasks:
+    - name: Explorer la structure du projet
+      type: bash
+      params:
+        command: |
+          echo "# 🌳 Structure du Projet" > structure_simple.md
+          echo "" >> structure_simple.md
+          echo "\`\`\`" >> structure_simple.md
+          tree -L 3 --dirsfirst >> structure_simple.md
+          echo "\`\`\`" >> structure_simple.md
+
+    - name: Vérifier le fichier généré
+      type: read
+      params:
+        file: "structure_simple.md"

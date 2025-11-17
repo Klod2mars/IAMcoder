@@ -1,0 +1,32 @@
+# ===========================================================
+# Configuration AIHomeCoder
+# ===========================================================
+
+# Configuration IA
+ia:
+  engine: "ollama"
+  model_default: "qwen2-coder:7b-instruct"
+  alt_model: "deepseek-coder:6.7b"
+
+# Sécurité
+security:
+  rollback: true
+  sanctuary_paths:
+    - "data/hive_boxes/**"
+    - ".env"
+    - "private/**"
+    - ".git/**"
+
+# Paramètres par défaut
+defaults:
+  profile: "qwen_local"
+  mode: "read_only"
+  log_level: "INFO"
+  diff_context: 3
+  max_file_size_mb: 10
+
+# Chemins
+paths:
+  logs: "logs"
+  data: "data"
+  chroma_db: "data/chroma_db"

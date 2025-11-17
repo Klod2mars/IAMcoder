@@ -1,0 +1,49 @@
+meta:
+  model: qwen2.5-coder:7b
+  mission_id: output_phase_02
+  version: 1.1
+  timestamp: 2025-10-30 17:12:45
+  status: completed
+
+summary:
+  mission_name: output_phase_02
+  description: >
+    Output phase validation completed successfully.
+    All required files have been generated and validated.
+
+context:
+  environment: ollama
+  language: English
+  mode: output_test
+  
+results:
+  markdown_report:
+    file: reports/mission_test_output.md
+    status: created
+    size: auto
+    format: markdown
+    
+  exchange_file:
+    file: exchange/qwen_to_deepseek_test.lialm
+    status: created
+    size: auto
+    format: lialm
+    
+  mission_log:
+    file: logs/mission_output_phase_02.log
+    status: created
+    size: auto
+    format: text
+
+validation:
+  files_created: true
+  formats_valid: true
+  post_actions_passed: true
+  
+next_phase:
+  action: Continue to next mission phase
+  estimated_duration: TBD
+
+notes: >
+  This LIALM file contains the exchange summary for handoff to the next model or phase.
+  All referenced files have been validated and are ready for consumption.

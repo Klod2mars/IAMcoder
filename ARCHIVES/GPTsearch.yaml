@@ -1,0 +1,39 @@
+meta:
+  project_name: "mission_read_context"
+  version: "1.0.0"
+  description: "Mission de lecture : observer le projet et générer un rapport Markdown de contexte."
+  mode: "read_only"
+
+context:
+  environment: "local"
+  output_format: "markdown"
+  guardrail:
+    sanctuaire_hive: true
+    exclude_patterns:
+      - "**/.git/**"
+      - "**/.dart_tool/**"
+      - "**/build/**"
+      - "**/venv/**"
+      - "**/__pycache__/**"
+
+tasks:
+  - name: "task_gather_overview"
+    goal: "Analyser la structure du projet et identifier les fichiers principaux."
+    task_type: "read"
+    parameters:
+      scan_depth: 3
+      include_extensions: [".py", ".md", ".yaml", ".yalm", ".txt"]
+
+  - name: "task_generate_report"
+    goal: "Créer un rapport de lecture Markdown avec la structure détectée."
+    task_type: "report"
+    parameters:
+      destination: "reports/context_report.md"
+
+outputs:
+  - format: "markdown"
+    destination: "reports/context_report.md"
+
+post_actions:
+  - "Validate that the report file exists."
+  - "Print confirmation message: '✅ Mission Lecture terminée — rapport généré dans /reports/'."

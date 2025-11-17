@@ -1,0 +1,47 @@
+# ===========================================================
+# 🧠 Example Mission - AIHomeCoder
+# ===========================================================
+# Ce fichier est un exemple de mission .yalm
+# Il démontre comment structurer des tâches pour l'exécution
+
+meta:
+  project_name: "example_mission"
+  architecture: "Clean Architecture (domain / data / presentation)"
+  language: "Python 3.10+"
+  description: >
+    Mission d'exemple pour démontrer le fonctionnement d'AIHomeCoder.
+    Cette mission crée un simple module Python avec tests.
+  author: "AIHomeCoder User"
+  version: "1.0.0"
+
+stack:
+  frameworks:
+    - pytest
+    - typer
+  environment:
+    min_python: "3.10"
+
+# ===========================================================
+# Tâches de construction
+# ===========================================================
+tasks:
+  - name: "Créer module example"
+    goal: "Créer un module Python simple avec une fonction utilitaire"
+    task_type: "code_generation"
+    parameters:
+      module_name: "example_module"
+      functionality: "Calculatrice basique"
+      
+  - name: "Ajouter tests unitaires"
+    goal: "Créer des tests pytest pour le module"
+    task_type: "test_generation"
+    parameters:
+      test_framework: "pytest"
+      coverage: true
+      
+  - name: "Créer README"
+    goal: "Documenter le module avec un README.md"
+    task_type: "documentation"
+    parameters:
+      include_usage: true
+      include_examples: true

@@ -1,0 +1,36 @@
+# ===========================================================
+# Profil IA par défaut
+# ===========================================================
+
+name: "default"
+description: "Configuration par défaut pour AIHomeCoder"
+
+model:
+  name: "qwen2-coder:7b-instruct"
+  temperature: 0.7
+  max_tokens: 2000
+
+prompts:
+  system: |
+    You are a helpful AI assistant specialized in code generation and refactoring.
+    Follow clean architecture principles and best practices.
+    
+  code_generation: |
+    Generate clean, well-documented code following Python best practices.
+    Use type hints and docstrings.
+
+  refactoring: |
+    Refactor the given code to improve readability, maintainability, and performance
+    while preserving existing functionality.
+    
+modes:
+  read_only:
+    description: "Read-only default: analysis and planning without file mutations."
+    allow_write: false
+    allow_delete: false
+    allow_move: false
+  write_enabled:
+    description: "Allows write/delete/move except protected sanctuary paths."
+    allow_write: true
+    allow_delete: true
+    allow_move: true

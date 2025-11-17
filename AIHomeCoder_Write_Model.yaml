@@ -1,0 +1,77 @@
+# ===========================================================
+# 🧩 Modèle Standard AIHomeCoder V2 - ÉCRITURE (Write)
+# ===========================================================
+# Ce modèle sert à modifier un fichier existant (ajout, remplacement, insertion, etc.)
+# Il fonctionne avec la logique V2 (content_from, target, plan_path, goal).
+
+meta:
+  project_name: "AIHomeCoder_Write_Model"
+  description: >
+    Mission d'écriture standard pour modification ciblée de fichiers Markdown.
+    Modifie ou insère du contenu dans un fichier Markdown existant.
+  version: "2.0.0"
+
+mode: write_enabled
+
+tasks:
+  - name: "task_apply_writes"
+    task_type: "task_apply_writes"
+    goal: "Modifier ou insérer du contenu dans un fichier Markdown existant."
+    parameters:
+      plan:
+        changes:
+          # Exemple 1 : remplacement complet
+          - action: overwrite
+            target: "C:/Users/roman/Documents/apppklod/RTMBOX/permacalendar_v2.md"
+            content_from: "C:/Users/roman/Documents/apppklod/RTMBOX/write_source.md"
+
+          # Exemple 2 : ajout d'un bloc après un repère
+          - action: insert_after
+            target: "C:/Users/roman/Documents/apppklod/RTMBOX/permacalendar_v2.md"
+            selectors:
+              after: "## Notes du jour"
+            content_from: "C:/Users/roman/Documents/apppklod/RTMBOX/write_source.md"
+
+          # Exemple 3 : modification inline
+          - action: replace_block
+            target: "C:/Users/roman/Documents/apppklod/RTMBOX/permacalendar_v2.md"
+            selectors:
+              start: "<!--BEGIN-SECTION:AGENDA-->"
+              end: "<!--END-SECTION:AGENDA-->"
+            content_from: "C:/Users/roman/Documents/apppklod/RTMBOX/write_source.md"
+
+# ===========================================================
+# 🛠️ Usage
+# ===========================================================
+# - target = fichier à modifier
+# - content_from = le contenu modèle (souvent ton write_source.md)
+# - selectors facultatifs pour cibler les blocs
+# - goal reste obligatoire (utile pour le guardrail)
+#
+# Actions disponibles:
+# - overwrite: Remplace complètement le contenu du fichier
+# - append: Ajoute du contenu à la fin du fichier
+# - insert_before: Insère du contenu avant un repère
+# - insert_after: Insère du contenu après un repère
+# - replace_block: Remplace un bloc entre deux repères
+#
+# Notes:
+# - Les chemins doivent être absoluts sous Windows ou ../RTMBOX/... si workspace différent
+# - goal reste obligatoire (guardrail)
+# - content_from et target remplacent source et file (V2)
+# - Mode: write_enabled pour autoriser les modifications
+
+# ===========================================================
+# 🧠 Structure universelle des missions
+# ===========================================================
+# Champ              | Description                              | Obligatoire
+# -------------------|------------------------------------------|------------
+# name               | Nom lisible de la mission                | ✅
+# mode               | read_only ou write_enabled                | ✅
+# tasks              | Liste des tâches (une ou plusieurs)       | ✅
+# goal               | Phrase explicite du but de la tâche       | ✅
+# parameters.plan    | Plan d'exécution des changements          | ✅ pour les écritures
+# target             | Fichier cible                             | ✅
+# content_from       | Fichier source (Markdown)                 | ✅ pour l'écriture
+# selectors          | Repères textuels pour insertions/remplacements | ⚙️ optionnel
+

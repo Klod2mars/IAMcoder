@@ -1,0 +1,22 @@
+# mission_read_rtm.yaml — version V1 compatible
+meta:
+  mode: "READ_ONLY_ANALYSIS"
+  workspace: "RTMBOX"
+  report_format: "markdown"
+  report_destination: "reports/context_report.md"
+
+tasks:
+  - name: "task_gather_overview"
+    type: "read"
+    goal: "Scanner le workspace RTMBOX et collecter les fichiers, dossiers et statistiques."
+    description: "Observation initiale du workspace avec respect du sanctuaire Hive."
+    parameters:
+      scan_depth: 5
+      include_extensions: [".py", ".md", ".yaml", ".yml", ".json"]
+
+  - name: "task_generate_report"
+    type: "report"
+    goal: "Générer un rapport Markdown complet à partir des données collectées."
+    description: "Structurer les données du scan et produire un rapport complet."
+    parameters:
+      report_template: "standard_context"

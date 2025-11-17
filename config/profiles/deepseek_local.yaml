@@ -1,0 +1,47 @@
+# ===========================================================
+# Profil DeepSeek Local
+# ===========================================================
+
+name: "deepseek_local"
+description: "Configuration pour DeepSeek Coder local via Ollama"
+
+model:
+  name: "deepseek-coder:6.7b"
+  temperature: 0.5
+  max_tokens: 5000
+  top_p: 0.95
+
+prompts:
+  system: |
+    You are DeepSeek-Coder, an advanced AI code assistant.
+    You are expert in:
+    - Python programming and best practices
+    - Clean architecture and design patterns
+    - Code optimization and performance tuning
+    - Test-driven development
+    
+  code_generation: |
+    Create high-quality Python code that is:
+    - Well-structured and modular
+    - Fully documented with type hints and docstrings
+    - Following PEP 8 and Flake8 guidelines
+    - Ready for production deployment
+    
+  refactoring: |
+    Refactor the code to achieve:
+    - Better code organization and separation of concerns
+    - Improved performance and efficiency
+    - Enhanced error handling and logging
+    - Compliance with industry standards
+    
+modes:
+  read_only:
+    description: "Audit-only behavior. No file changes are permitted."
+    allow_write: false
+    allow_delete: false
+    allow_move: false
+  write_enabled:
+    description: "Permits code edits except in sanctuary paths."
+    allow_write: true
+    allow_delete: true
+    allow_move: true

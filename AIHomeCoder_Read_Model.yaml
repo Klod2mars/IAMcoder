@@ -1,0 +1,43 @@
+# ===========================================================
+# 🧩 Modèle Standard AIHomeCoder V2 - LECTURE (Read)
+# ===========================================================
+# Ce modèle crée une mission qui lit, rassemble et écrit un résumé
+# dans un fichier Markdown à la racine.
+
+meta:
+  project_name: "AIHomeCoder_Read_Model"
+  description: >
+    Mission de lecture standard pour extraction de données.
+    Lit un ou plusieurs fichiers Markdown et extrait les sections contenant des données spécifiques.
+  version: "2.0.0"
+
+mode: read_only
+
+tasks:
+  - name: "task_gather_overview"
+    task_type: "gather_overview"
+    goal: "Lire un ou plusieurs fichiers Markdown et extraire les sections contenant des données spécifiques."
+    parameters:
+      sources:
+        - "C:/Users/roman/Documents/apppklod/RTMBOX/data_source.md"
+      output: "read_result.md"
+      filters:
+        include_headings: true
+        include_code: false
+        keywords:
+          - "Objectif"
+          - "Conclusion"
+          - "Résumé"
+
+# ===========================================================
+# 📖 Usage
+# ===========================================================
+# - Lit data_source.md ou plusieurs fichiers listés dans sources
+# - Crée un read_result.md à la racine (résumé filtré)
+# - goal donne à Cursor le sens de la mission
+#
+# Notes:
+# - Les chemins doivent être absoluts sous Windows ou ../RTMBOX/... si workspace différent
+# - goal reste obligatoire (guardrail)
+# - Mode: read_only pour sécuriser les opérations de lecture
+

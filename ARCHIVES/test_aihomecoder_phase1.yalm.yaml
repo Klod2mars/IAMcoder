@@ -1,0 +1,108 @@
+# ===========================================================
+# 🧠 A I H O M E C O D E R – PHASE DE TEST INTERNE V1.0 🧠
+# ===========================================================
+meta:
+  project: "aihomecoder"
+  mission: "Validation du moteur de base"
+  author: "Claude AI"
+  date: "2025-10-30"
+  mode: "execution-local"
+  target_folder: "./"
+  notes: >
+    Ce plan teste les modules fondamentaux du moteur aihomecoder :
+    - Lecture et parsing des fichiers .YALM
+    - Génération et application de diffs
+    - Connexion IA locale (simulation)
+    - Rollback, logs et sanctuaire
+    Les tests sont exécutés sans dépendre d’un modèle externe actif.
+# ===========================================================
+
+stack_check:
+  python_version: ">=3.10"
+  required_libs:
+    - typer
+    - pyyaml
+    - gitpython
+    - chromadb
+    - rich
+    - loguru
+  optional_libs:
+    - textual
+    - fastapi
+  expected_entrypoint: "main.py"
+
+security:
+  rollback_enabled: true
+  ignore_paths:
+    - "data/hive_boxes/**"
+    - ".env"
+    - ".git/**"
+
+# ===========================================================
+# 🧪 TESTS UNITAIRES & INTÉGRÉS
+# ===========================================================
+tests:
+  - name: "Vérifier le parsing des fichiers .YALM"
+    description: >
+      Charger example_mission.yalm et s’assurer que le parser
+      extrait correctement le nom des tâches et leurs fichiers cibles.
+    file_target: "data/yaml_parser.py"
+    expected_output: "Liste de tasks détectée"
+
+  - name: "Tester la création d’un diff"
+    description: >
+      Modifier une fonction de test dans tests/dummy_file.py,
+      générer un patch avec diff_engine.py et vérifier que le rollback
+      restaure l’état initial.
+    files:
+      - "data/diff_engine.py"
+      - "tests/dummy_file.py"
+    expected_output: "Patch généré + rollback confirmé"
+
+  - name: "Simuler une exécution IA"
+    description: >
+      Simuler un prompt envoyé au connecteur IA local (ai_connector.py)
+      avec un texte simple et vérifier que le moteur renvoie une réponse.
+    files:
+      - "data/ai_connector.py"
+    expected_output: "Réponse simulée : OK"
+
+  - name: "Vérifier le logger"
+    description: >
+      Générer un log Markdown dans /logs/session_test.md contenant
+      les 3 étapes précédentes.
+    files:
+      - "presentation/logger.py"
+      - "logs/session_test.md"
+    expected_output: "Fichier log créé avec horodatage"
+
+  - name: "Valider la CLI principale"
+    description: >
+      Lancer la commande `python main.py run example_mission.yalm`
+      et vérifier que toutes les étapes s’exécutent sans erreur.
+    files:
+      - "presentation/cli.py"
+      - "main.py"
+    expected_output: "Exécution terminée sans erreur"
+
+# ===========================================================
+# 📊 RAPPORT FINAL
+# ===========================================================
+report:
+  output_file: "logs/session_validation_phase1.md"
+  include_sections:
+    - "Résultats des tests"
+    - "Logs détaillés"
+    - "Statut de rollback"
+    - "Résumé final"
+  success_condition: "5/5 tests passed"
+
+# ===========================================================
+# ✅ ATTENDU FINAL
+# ===========================================================
+final_deliverable:
+  - "Un rapport Markdown complet dans /logs/session_validation_phase1.md"
+  - "Confirmation que la CLI fonctionne"
+  - "Parser YAML opérationnel"
+  - "DiffEngine et rollback validés"
+  - "Logs lisibles en console (Rich + Loguru)"

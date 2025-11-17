@@ -1,0 +1,40 @@
+meta:
+  project_name: "tree_scan_activation_test"
+  author: "Pré-Humain Directeur Adjoint"
+  date: "2025-11-02"
+  goal: >
+    Vérifier que la correction du parser YAML permet à AIHomeCoder
+    d'exécuter correctement la tâche 'tree_scan' définie via id seul.
+  mode: "read_only"
+  sanctuaire_hive: true
+
+context:
+  workspace: "C:/Users/roman/Documents/apppklod/permacalendarv2"
+  output_format: "markdown"
+  variables:
+    - name: "REPORT_PATH"
+      value: "reports/tree_scan_activation_report.md"
+
+tasks:
+  - id: "tree_scan"
+    goal: "Parcourir le workspace et générer un rapport d'arborescence."
+    parameters:
+      destination: "${REPORT_PATH}"
+      extensions:
+        - ".dart"
+        - ".yaml"
+      include_hidden: false
+      depth_limit: 5
+    output:
+      destination: "${REPORT_PATH}"
+      format: "markdown"
+
+post_actions:
+  - "Afficher les 20 premières lignes du rapport généré."
+  - "Publier les statistiques de nombre de fichiers et dossiers."
+  - "Confirmer que le log ne contient plus d’avertissement 'sans logique spécifique'."
+
+intent:
+  - "Valider que le mappage id → task_type fonctionne."
+  - "Confirmer que task_tree_scan est bien appelé et produit son rapport."
+  - "Observer les nouveaux logs de dispatch et de validation."

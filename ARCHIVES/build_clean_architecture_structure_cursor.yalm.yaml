@@ -1,0 +1,115 @@
+meta:
+  project_name: "build_clean_architecture_structure_cursor"
+  version: "1.0.0"
+  description: "Chantier de reconstruction Clean Architecture du moteur AIHomeCoder (phase finale assistée par Cursor)"
+  author: "Pré-Humain Directeur Adjoint"
+  environment: "Cursor Local"
+  philosophy: "Observer avant d’écrire, structurer avant d’agir."
+
+context:
+  mode: "WRITE_ENABLED"
+  sanctuaire_hive: true
+  read_only_protection: false
+  output_format: "markdown"
+  log_level: "INFO"
+
+intent:
+  - "Vérifier la cohérence des chemins racine du projet AIHomeCoder"
+  - "Créer physiquement la structure Clean Architecture (core, data, domain, modules, presentation)"
+  - "S’assurer que les __init__.py sont présents"
+  - "Documenter la structure dans un rapport Markdown"
+  - "Archiver le log brut du chantier"
+
+scope:
+  include:
+    - "core/**"
+    - "data/**"
+    - "domain/**"
+    - "modules/**"
+    - "presentation/**"
+    - "config/**"
+  exclude:
+    - "venv/**"
+    - ".git/**"
+    - "private/**"
+    - "data/hive_boxes/**"
+
+tasks:
+  - name: "Préparation du chantier"
+    description: "Analyser la structure actuelle et identifier les dossiers manquants"
+    task_type: "scan"
+    parameters:
+      root: "."
+      max_depth: 3
+      output: "reports/scan_before_build.md"
+
+  - name: "Construction des dossiers Clean Architecture"
+    description: "Créer les répertoires principaux manquants dans AIHomeCoder"
+    task_type: "filesystem"
+    parameters:
+      create:
+        - "core"
+        - "data"
+        - "domain"
+        - "modules"
+        - "presentation"
+        - "reports"
+        - "logs"
+
+  - name: "Insertion des fichiers __init__.py"
+    description: "Assurer la modularité Python dans chaque sous-répertoire"
+    task_type: "write"
+    parameters:
+      pattern: "__init__.py"
+      target_folders:
+        - "core"
+        - "data"
+        - "domain"
+        - "modules"
+        - "presentation"
+      content: |
+        # Module initialisé par Cursor
+        # Structure validée par Pré-Humain
+        # Date : {{ date }}
+
+  - name: "Validation Guardrail"
+    description: "Confirmer que la sécurité en lecture/écriture est intacte"
+    task_type: "check"
+    parameters:
+      file: "core/guardrail.py"
+      must_contain: "Forbidden in read_only mode"
+
+  - name: "Génération de la carte Clean Architecture"
+    description: "Produire le rapport complet de structure et d’état"
+    task_type: "report"
+    parameters:
+      destination: "reports/clean_architecture_tree.md"
+      format: "markdown"
+      sections:
+        - "Structure du projet"
+        - "Modules présents"
+        - "Modules manquants"
+        - "État des fichiers init"
+        - "Résumé de conformité"
+
+  - name: "Enregistrement du log brut"
+    description: "Sauvegarder la trace intégrale du chantier"
+    task_type: "log"
+    parameters:
+      destination: "logs/structure_build.log"
+
+report:
+  format: "markdown"
+  destination: "reports/clean_architecture_build_report.md"
+  sections:
+    - "Executive Summary"
+    - "Structure Générée"
+    - "Fichiers créés"
+    - "Vérification Guardrail"
+    - "Résultat Final"
+
+post_actions:
+  - "Display summary in terminal."
+  - "Validate that both report and log exist."
+  - "Print confirmation: '✅ Chantier Clean Architecture terminé avec Cursor.'"
+  - "Archive mission file in ARCHIVES/build_clean_architecture_structure_cursor.yalm.yaml"
