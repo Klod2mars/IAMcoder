@@ -1,4 +1,0 @@
-meta: { project_name: "audit_flex_prompt" }
-prompt: "Examiner la robustesse du parser et proposer un mode prompt-only."
-mode: prompt_only
-
