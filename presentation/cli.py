@@ -36,7 +36,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 if TYPER_AVAILABLE:
-    app = typer.Typer(help="AIHomeCoder - Moteur local de co-edition de code")
+    app = typer.Typer(help="IAMcoder - Moteur local de co-edition de code")
 else:
     app = None
 console = Console() if RICH_AVAILABLE else None
@@ -130,7 +130,7 @@ if TYPER_AVAILABLE:
         
         # Logger
         logger = Logger()
-        logger.log_header("AIHomeCoder - Exécution de mission")
+        logger.log_header("IAMcoder - Exécution de mission")
         logger.log_info(f"Mission file: {mission_file}")
         logger.log_info(f"Workspace: {resolved_workspace}")
         logger.log_info(f"Mode auto-run: {'activé' if effective_auto_run else 'interactif'}")
@@ -320,11 +320,11 @@ if TYPER_AVAILABLE:
     @app.command()
     def version():
         """
-        Affiche la version de AIHomeCoder
+        Affiche la version de IAMcoder
         """
         active_settings = settings_module.get_settings()
         version_info = f"""
-AIHomeCoder v{active_settings.metadata.get('version', '1.0.0')}
+IAMcoder v{active_settings.metadata.get('version', '1.2.1')}
 
 Clean Architecture Python Application
 Local code co-editing engine with AI integration

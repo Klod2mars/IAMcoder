@@ -1,0 +1,25 @@
+meta:
+  project_name: "Test IAMcoder"
+  description: "Remplacement simple d'une ligne dans un fichier de test"
+  version: "1.0"
+
+metadata:
+  workspace: "."  # Ici, le workspace est la racine où se trouve le fichier YAML
+  auto_run: true
+
+tasks:
+  - name: "remplacement_test"
+    task_type: "yaml_apply"
+    parameters:
+      instructions:
+        replacements:
+          - file: "test_replace.txt"
+            anchor: "// IAMCODER-REPLACE-ME"
+            include_anchor: true
+            delete_count: 1
+            verify_before: "// IAMCODER-REPLACE-ME"
+            after: |
+              // IAMCODER-REPLACED
+              Cette ligne a été remplacée par IAMcoder.
+      dry_run: true
+      output: "./permacalendar_test_report.json"

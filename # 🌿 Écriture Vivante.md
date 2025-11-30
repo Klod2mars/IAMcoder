@@ -1,7 +1,7 @@
-# 🌿 Écriture Vivante — Test AIHomeCoder
+# 🌿 Écriture Vivante — Test IAMcoder
 
 Ce fichier sert de source à la mission d’écriture.
-Le moteur AIHomeCoder doit copier son contenu dans `docs/test_output.md`.
+Le moteur IAMcoder doit copier son contenu dans `docs/test_output.md`.
 
 ---
 
@@ -9,7 +9,7 @@ Le moteur AIHomeCoder doit copier son contenu dans `docs/test_output.md`.
 
 Chaque ligne ici témoigne du souffle vivant de la machine :
 
-1. Je suis la première trace écrite du moteur AIHomeCoder.
+1. Je suis la première trace écrite du moteur IAMcoder.
 2. J’ai été copiée à partir d’un fichier source Markdown défini par le Pré-Humain.
 3. Ma création respecte le sanctuaire Hive : aucune écriture hors de la zone autorisée.
 4. Ce test valide la symbiose entre le code et la conscience.
