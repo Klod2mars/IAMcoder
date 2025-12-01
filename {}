@@ -1,12 +1,13 @@
 {
-  "generated_at": "2025-12-01T16:03:37.136585Z",
+  "generated_at": "2025-12-01T16:03:42.495954Z",
   "workspace": "C:\\Users\\roman\\Documents\\apppklod\\aihomecoder",
   "entries": [
     {
       "file": "testsystemIAMcoder/example_widget.dart",
       "target": "C:\\Users\\roman\\Documents\\apppklod\\aihomecoder\\testsystemIAMcoder\\example_widget.dart",
-      "would_change": true
+      "backup": "C:\\Users\\roman\\Documents\\apppklod\\aihomecoder\\backups\\example_widget.dart.bak_20251201170342",
+      "applied": true
     }
   ],
-  "status": "dry_run_ok"
+  "status": "applied"
 }

@@ -3,15 +3,15 @@ import '../../core/services/plant_lifecycle_service.dart';
 import '../../features/plant_catalog/domain/entities/plant_entity.dart';
 import '../../core/theme/app_icons.dart';
 
-/// Widget simplifié pour afficher le cycle de vie d'une plante
-/// Compatible avec la nouvelle architecture PlantLifecycleService
-class PlantLifecycleWidget extends StatelessWidget {
+/// Nouveau widget de test (remplace l'ancienne classe PlantLifecycleWidget)
+/// Version factice et plus conséquente pour test de migration
+class PlantLifecyclePanel extends StatefulWidget {
   final PlantFreezed plant;
   final DateTime plantingDate;
   final double? initialProgress;
   final VoidCallback? onUpdateLifecycle;
 
-  const PlantLifecycleWidget({
+  const PlantLifecyclePanel({
     super.key,
     required this.plant,
     required this.plantingDate,
@@ -20,276 +20,150 @@ class PlantLifecycleWidget extends StatelessWidget {
   });
 
   @override
+  State<PlantLifecyclePanel> createState() => _PlantLifecyclePanelState();
+}
+
+class _PlantLifecyclePanelState extends State<PlantLifecyclePanel> {
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, dynamic>>(
-      future: PlantLifecycleService.calculateLifecycle(plant, plantingDate, initialProgress: initialProgress ?? 0.0),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  const Icon(Icons.error, color: Colors.red, size: 48),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Erreur lors du calcul du cycle de vie',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Erreur: ${snapshot.error}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
-
-        final lifecycle = snapshot.data!;
-        return _buildLifecycleCard(context, lifecycle);
-      },
-    );
-  }
-
-  Widget _buildLifecycleCard(BuildContext context, Map<String, dynamic> lifecycle) {
-    final currentStage = lifecycle['currentStage'] as String;
-    final progress = lifecycle['progress'] as double;
-    final nextAction = lifecycle['nextAction'] as String;
-    final germinationDate = lifecycle['germinationDate'] as DateTime;
-    final expectedHarvestDate = lifecycle['expectedHarvestDate'] as DateTime;
-
     return Card(
-      elevation: 4,
+      elevation: 6,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(context, currentStage, progress),
-            const SizedBox(height: 16),
-            _buildDateInfo(context, germinationDate, expectedHarvestDate),
-            const SizedBox(height: 16),
-            _buildNextAction(context, nextAction),
-            if (onUpdateLifecycle != null) ...[
-              const SizedBox(height: 16),
-              _buildActionButton(context),
-            ],
+            _header(context),
+            const SizedBox(height: 12),
+            _metrics(context),
+            const SizedBox(height: 12),
+            _timeline(context),
+            const SizedBox(height: 12),
+            if (widget.onUpdateLifecycle != null) _actionRow(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, String currentStage, double progress) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(
-              _getStageIcon(currentStage),
-              color: _getStageColor(currentStage),
-              size: 24,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              _getStageDisplayName(currentStage),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: _getStageColor(currentStage),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        LinearProgressIndicator(
-          value: progress,
-          backgroundColor: Colors.grey[300],
-          valueColor: AlwaysStoppedAnimation<Color>(_getStageColor(currentStage)),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '${(progress * 100).toInt()}% du cycle complété',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDateInfo(BuildContext context, DateTime germinationDate, DateTime expectedHarvestDate) {
-    final now = DateTime.now();
-    final daysToGermination = germinationDate.difference(now).inDays;
-    final daysToHarvest = expectedHarvestDate.difference(now).inDays;
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Column(
-        children: [
-          _buildDateRow(
-            context,
-            AppIcons.seedling,
-            'Germination',
-            germinationDate,
-            daysToGermination > 0 ? 'Dans $daysToGermination jours' : 'Passée',
-            daysToGermination <= 0 ? Colors.green : Colors.orange,
-          ),
-          const SizedBox(height: 8),
-          _buildDateRow(
-            context,
-            AppIcons.harvest, // 🧺 Basket icon for harvest
-            'Récolte prévue',
-            expectedHarvestDate,
-            daysToHarvest > 0 ? 'Dans $daysToHarvest jours' : 'Maintenant !',
-            daysToHarvest <= 0 ? Colors.green : Colors.blue,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateRow(BuildContext context, IconData icon, String label, DateTime date, String timeText, Color color) {
+  Widget _header(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(icon, size: 20, color: color),
+        Icon(AppIcons.plant, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+                'Plant Lifecycle — IAMcoder Test',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
+              const SizedBox(height: 4),
               Text(
-                '${date.day}/${date.month}/${date.year}',
+                'Planted: ${widget.plantingDate.day}/${widget.plantingDate.month}/${widget.plantingDate.year}',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            timeText,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+        IconButton(
+          icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
+          onPressed: () => setState(() => _expanded = !_expanded),
         ),
       ],
     );
   }
 
-  Widget _buildNextAction(BuildContext context, String nextAction) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.blue[200]!),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.lightbulb_outline, color: Colors.blue[700], size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Prochaine action',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: Colors.blue[700],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  nextAction,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+  Widget _metrics(BuildContext context) {
+    final progress = (widget.initialProgress ?? 0.0).clamp(0.0, 1.0);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        LinearProgressIndicator(value: progress),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _metricTile('Progress', '${(progress * 100).toInt()}%'),
+            const SizedBox(width: 8),
+            _metricTile('Stage', 'Germination'),
+            const SizedBox(width: 8),
+            _metricTile('Health', 'Good'),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _buildActionButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: onUpdateLifecycle,
-        icon: const Icon(Icons.update),
-        label: const Text('Mettre à jour le cycle — IAMcoder'),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+  Widget _metricTile(String label, String value) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            const SizedBox(height: 4),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+          ],
         ),
       ),
     );
   }
 
-  IconData _getStageIcon(String stage) {
-    switch (stage.toLowerCase()) {
-      case 'germination':
-        return AppIcons.seedling;
-      case 'croissance':
-        return Icons.grass; // Keep grass as-is (not in common set)
-      case 'fructification':
-        return AppIcons.flower;
-      case 'récolte':
-        return AppIcons.harvest; // 🧺 Basket icon for harvest
-      default:
-        return AppIcons.plant;
+  Widget _timeline(BuildContext context) {
+    if (!_expanded) {
+      return const SizedBox.shrink();
     }
+    final now = DateTime.now();
+    final steps = [
+      {'label': 'Sowing', 'date': now.subtract(Duration(days: 20))},
+      {'label': 'Germination', 'date': now.subtract(Duration(days: 10))},
+      {'label': 'Growth', 'date': now.add(Duration(days: 10))},
+      {'label': 'Harvest', 'date': now.add(Duration(days: 40))},
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: steps.map((s) {
+        final d = s['date'] as DateTime;
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          child: Row(
+            children: [
+              Container(width: 6, height: 6, decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
+              const SizedBox(width: 10),
+              Expanded(child: Text('${s['label']} — ${d.day}/${d.month}/${d.year}')),
+            ],
+          ),
+        );
+      }).toList(),
+    );
   }
 
-  Color _getStageColor(String stage) {
-    switch (stage.toLowerCase()) {
-      case 'germination':
-        return Colors.green;
-      case 'croissance':
-        return Colors.lightGreen;
-      case 'fructification':
-        return Colors.orange;
-      case 'récolte':
-        return Colors.red;
-      default:
-        return Colors.green;
-    }
-  }
-
-  String _getStageDisplayName(String stage) {
-    switch (stage.toLowerCase()) {
-      case 'germination':
-        return 'Germination';
-      case 'croissance':
-        return 'Croissance';
-      case 'fructification':
-        return 'Fructification';
-      case 'récolte':
-        return 'Récolte';
-      default:
-        return 'Germination';
-    }
+  Widget _actionRow(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: widget.onUpdateLifecycle,
+            icon: const Icon(Icons.update),
+            label: const Text('Mettre à jour le cycle — IAMcoder (Complex Test)'),
+            style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+          ),
+        ),
+        const SizedBox(width: 12),
+        OutlinedButton(
+          onPressed: () {},
+          child: const Text('Details'),
+        ),
+      ],
+    );
   }
 }

@@ -2,8 +2,10 @@ meta:
   project_name: IAMcoder
   description: "Replace entire class in example_widget.dart (complex test)"
   version: "1.1"
-  context:
-    mode: write_enabled
+
+# <- CONTEXT DOIT ÊTRE ICI (top-level), PAS sous meta
+context:
+  mode: write_enabled
 
 tasks:
   - name: apply_writes_dry_run
