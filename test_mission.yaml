@@ -2,6 +2,8 @@ meta:
   project_name: IAMcoder
   description: "Replace entire class in example_widget.dart (complex test)"
   version: "1.1"
+  context:
+    mode: write_enabled
 
 tasks:
   - name: apply_writes_dry_run
@@ -238,146 +240,8 @@ tasks:
                   return Card(
                     elevation: 6,
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _header(context),
-                          const SizedBox(height: 12),
-                          _metrics(context),
-                          const SizedBox(height: 12),
-                          _timeline(context),
-                          const SizedBox(height: 12),
-                          if (widget.onUpdateLifecycle != null) _actionRow(context),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-              
-                Widget _header(BuildContext context) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(AppIcons.plant, color: Theme.of(context).colorScheme.primary),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Plant Lifecycle — IAMcoder Test',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Planted: ${widget.plantingDate.day}/${widget.plantingDate.month}/${widget.plantingDate.year}',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
-                        onPressed: () => setState(() => _expanded = !_expanded),
-                      ),
-                    ],
-                  );
-                }
-              
-                Widget _metrics(BuildContext context) {
-                  // Bloc factice qui affiche plusieurs métriques
-                  final progress = (widget.initialProgress ?? 0.0).clamp(0.0, 1.0);
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      LinearProgressIndicator(value: progress),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          _metricTile('Progress', '${(progress * 100).toInt()}%'),
-                          const SizedBox(width: 8),
-                          _metricTile('Stage', 'Germination'),
-                          const SizedBox(width: 8),
-                          _metricTile('Health', 'Good'),
-                        ],
-                      ),
-                    ],
-                  );
-                }
-              
-                Widget _metricTile(String label, String value) {
-                  return Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
-                          const SizedBox(height: 4),
-                          Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-              
-                Widget _timeline(BuildContext context) {
-                  // Bloc déroulable plus long pour simuler une logique plus lourde
-                  if (!_expanded) {
-                    return const SizedBox.shrink();
-                  }
-                  final now = DateTime.now();
-                  final steps = [
-                    {'label': 'Sowing', 'date': now.subtract(Duration(days: 20))},
-                    {'label': 'Germination', 'date': now.subtract(Duration(days: 10))},
-                    {'label': 'Growth', 'date': now.add(Duration(days: 10))},
-                    {'label': 'Harvest', 'date': now.add(Duration(days: 40))},
-                  ];
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: steps.map((s) {
-                      final d = s['date'] as DateTime;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6.0),
-                        child: Row(
-                          children: [
-                            Container(width: 6, height: 6, decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
-                            const SizedBox(width: 10),
-                            Expanded(child: Text('${s['label']} — ${d.day}/${d.month}/${d.year}')),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  );
-                }
-              
-                Widget _actionRow(BuildContext context) {
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: widget.onUpdateLifecycle,
-                          icon: const Icon(Icons.update),
-                          label: const Text('Mettre à jour le cycle — IAMcoder (Complex Test)'),
-                          style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      OutlinedButton(
-                        onPressed: () {},
-                        child: const Text('Details'),
-                      ),
-                    ],
-                  );
-                }
-              }
-            append: false
-            create_backup: true
-      dry_run: false
-      create_backup: true
-      create_git_checkpoint: false
+Muy bien. We need to respond to user's statement; they provided last YAML that worked. They say assistant had trouble with syntax; now they've provided the working YAML again. What should assistant do? Provide corrected YAML for complex replacement? The user earlier asked to modify test_mission.yaml, and we provided two variants; now they gave last working YAML and asked to proceed. They probably want assistant to generate the new test_mission.yaml correctly. The user last message cut off at "child: Padding(...". We should respond in French, produce full corrected YAML as final, ensuring no syntax errors. But we've already provided YAML previously. Now user posted that partial working YAML. Possibly they want us to produce final YAML in same style as original but replacing class; we earlier produced it. Maybe they want to ensure syntax correct. So provide final corrected YAML in one block, ensuring it's syntactically valid. Also add instructions: save and run. Keep concise.
+
+Let's deliver final YAML again with meta.context.mode: write_enabled. Ensure proper indentation and no trailing non-YAML characters. Also ensure "append: false" is correctly indented under each write. Also for apply_writes_live parameters include dry_run: false outside instructions. Add create_backup etc. Let's craft final YAML and mention to save. Provide one-liner to run.
+
+Ok produce final.
