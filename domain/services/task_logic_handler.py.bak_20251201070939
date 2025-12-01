@@ -1,4 +1,15 @@
-﻿# domain/services/task_logic_handler.py
+$root = Get-Location
+$src = Join-Path $root "domain\services\task_logic_handler.py"
+$bak_ts = Get-Date -Format "yyyyMMddHHmmss"
+$bak = Join-Path (Split-Path $src) ("task_logic_handler.py.bak_" + $bak_ts)
+
+# 1) Backup (obligatoire)
+Write-Host "Backup: $src -> $bak"
+Copy-Item -Path $src -Destination $bak -Force
+
+# 2) Overwrite the file with the fixed Python content
+$py = @'
+# domain/services/task_logic_handler.py
 from pathlib import Path
 import os
 import json
@@ -173,3 +184,32 @@ class TaskLogicHandler:
 
 
 # End of task_logic_handler.py
+'@
+
+Set-Content -Path $src -Value $py -Encoding UTF8
+
+# 3) Quick syntax check
+Write-Host "Running python -m py_compile domain/services/task_logic_handler.py"
+python -m py_compile domain/services/task_logic_handler.py
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "py_compile failed. Inspect domain/services/task_logic_handler.py and restore backup if needed:"
+    Write-Host "Copy-Item -Path '$bak' -Destination '$src' -Force"
+    exit 1
+} else {
+    Write-Host "py_compile OK."
+}
+
+# 4) Quick import smoke-test
+Write-Host "Running import test..."
+python - <<'PY'
+try:
+    import importlib
+    m = importlib.import_module("domain.services.task_logic_handler")
+    print("import OK")
+except Exception as e:
+    import traceback
+    traceback.print_exc()
+    raise
+PY
+
+Write-Host "Backup kept at: $bak"
