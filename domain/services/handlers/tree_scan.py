@@ -7,15 +7,8 @@ from typing import Any, Dict, List, Optional
 
 from core.file_manager import file_manager
 from core.guardrail import guardrail
-
+from domain.services.helpers import _pick_string
 logger = logging.getLogger(__name__)
-
-
-def _pick_string(*candidates: Optional[Any]) -> Optional[str]:
-    for c in candidates:
-        if isinstance(c, str) and c:
-            return c
-    return None
 
 
 def should_skip(path: Path, ignore_names: List[str], ignore_patterns: List[str]) -> bool:

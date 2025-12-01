@@ -7,18 +7,12 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from core.file_manager import file_manager
-from core.guardrail import guardrail
+from domain.services.helpers import _pick_string
+
 
 logger = logging.getLogger(__name__)
 
 
-def _pick_string(*candidates: Optional[Any]) -> Optional[str]:
-    for candidate in candidates:
-        if isinstance(candidate, str):
-            cand = candidate.strip()
-            if cand:
-                return cand
-    return None
 
 
 def task_gather_overview(params: Dict[str, Any], context: Dict[str, Any]) -> str:

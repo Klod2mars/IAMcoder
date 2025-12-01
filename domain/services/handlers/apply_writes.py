@@ -7,43 +7,14 @@ from typing import Any, Dict, List, Optional
 
 from core.file_manager import file_manager
 from core.guardrail import guardrail
+from domain.services.helpers import (
+    _pick_string,
+    _stringify_content,
+    _to_bool,
+    _safe_write_text,
+)
 
 logger = logging.getLogger(__name__)
-
-
-def _pick_string(*candidates: Optional[Any]) -> Optional[str]:
-    for c in candidates:
-        if isinstance(c, str) and c:
-            return c
-    return None
-
-
-def _stringify_content(value: Any) -> Optional[str]:
-    if value is None:
-        return None
-    if isinstance(value, str):
-        return value
-    try:
-        # For common container types, serialize to JSON for deterministic text
-        return json.dumps(value, ensure_ascii=False, indent=None)
-    except Exception:
-        try:
-            return str(value)
-        except Exception:
-            return None
-
-
-def _to_bool(value: Any) -> bool:
-    if isinstance(value, bool):
-        return value
-    if value is None:
-        return False
-    if isinstance(value, (int, float)):
-        return bool(value)
-    if isinstance(value, str):
-        v = value.strip().lower()
-        return v in ("1", "true", "yes", "y", "on")
-    return False
 
 
 def _resolve_workspace_path(candidate: Optional[str], context: Dict[str, Any]) -> Path:
@@ -60,35 +31,6 @@ def _read_text(fm, path_obj: Path, encoding: str = "utf-8") -> Optional[str]:
         return path_obj.read_text(encoding=encoding)
     except Exception:
         return None
-
-
-def _safe_write_text(fm, path_obj: Path, content: str, *, append: bool = False, encoding: str = "utf-8"):
-    # Ensure parent
-    parent = path_obj.parent
-    try:
-        parent.mkdir(parents=True, exist_ok=True)
-    except Exception as e:
-        logger.debug("Could not ensure parent dir %s: %s", parent, e)
-    try:
-        if append:
-            old = None
-            try:
-                old = _read_text(fm, path_obj, encoding=encoding)
-            except Exception:
-                old = None
-            new_content = (old or "") + content
-            if hasattr(fm, "write_file"):
-                fm.write_file(str(path_obj), new_content)
-            else:
-                path_obj.write_text(new_content, encoding=encoding)
-        else:
-            if hasattr(fm, "write_file"):
-                fm.write_file(str(path_obj), content)
-            else:
-                path_obj.write_text(content, encoding=encoding)
-    except Exception:
-        # propagate to caller so caller can aggregate errors
-        raise
 
 
 def task_apply_writes(params: Dict[str, Any], context: Dict[str, Any]) -> str:

@@ -4,39 +4,13 @@ import json
 import datetime
 import logging
 from typing import Any, Dict, List, Optional
-
+from domain.services.helpers import _resolve_placeholders, _pick_string
 from core.file_manager import file_manager
 from core.guardrail import guardrail
 
 logger = logging.getLogger(__name__)
 
 
-def _resolve_placeholders(value: Any, variables: Dict[str, str]) -> Any:
-    """Replace ${VAR} placeholders in strings, lists or dicts (minimal)."""
-    if isinstance(value, str):
-        result = value
-        for key, raw_val in variables.items():
-            result = result.replace(f"${{{key}}}", str(raw_val))
-        return result
-    if isinstance(value, list):
-        return [_resolve_placeholders(item, variables) for item in value]
-    if isinstance(value, dict):
-        return {
-            key: _resolve_placeholders(val, variables)
-            for key, val in value.items()
-        }
-    return value
-
-
-def _pick_string(*candidates: Optional[Any]) -> Optional[str]:
-    for candidate in candidates:
-        resolved = candidate
-        if isinstance(candidate, str):
-            resolved = candidate.strip()
-        # If candidate might be a placeholder or other type, return its string form if non-empty
-        if isinstance(resolved, str) and resolved:
-            return resolved
-    return None
 
 
 def task_generate_report(params: Dict[str, Any], context: Dict[str, Any]) -> str:
