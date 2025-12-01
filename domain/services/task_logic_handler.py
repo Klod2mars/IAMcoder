@@ -232,11 +232,14 @@ class TaskLogicHandler:
         return mapping
 
 
-def task_tree_scan(params, context):
+def apply_yaml_replacements(params, context):
     """
-    Parcourt le workspace actif et génère un rapport Markdown listant
-    les répertoires et fichiers ciblés (par défaut .dart).
-    Compatible avec le mode read_only via FileManager + Guardrail.
+    Wrapper léger : délègue à domain.services.handlers.yaml_apply.apply_yaml_replacements.
+    """
+    from domain.services.handlers.yaml_apply import apply_yaml_replacements as _external_apply_yaml_replacements
+    return _external_apply_yaml_replacements(params, context)
+
+def task_tree_scan(params, context):
     """
 
     start_timestamp = datetime.datetime.now()
