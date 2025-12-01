@@ -9,32 +9,21 @@ from typing import Any, Dict, List, Optional
 from core.file_manager import file_manager
 from core.guardrail import guardrail
 
+from domain.services.helpers import (
+    _resolve_placeholders,
+    _pick_string,
+    _to_bool,
+)
+
 logger = logging.getLogger(__name__)
 
 
-def _pick_string(*candidates: Optional[Any]) -> Optional[str]:
-    for candidate in candidates:
-        if isinstance(candidate, str) and candidate.strip():
-            return candidate.strip()
-    return None
-
-
-def _resolve_placeholders(value: Any, variables: Dict[str, str]) -> Any:
-    # Minimal placeholder resolution (simple ${VAR} replacement for strings,
-    # recursive for lists/dicts) — adapted from original task logic.
-    if isinstance(value, str):
-        result = value
-        for key, raw_val in variables.items():
-            result = result.replace(f"${{{key}}}", str(raw_val))
-        return result
-    if isinstance(value, list):
-        return [_resolve_placeholders(item, variables) for item in value]
-    if isinstance(value, dict):
-        return {k: _resolve_placeholders(v, variables) for k, v in value.items()}
-    return value
-
-
-def _collect_terms(source, variables: Dict[str, str]) -> List[str]:
+def _collect_terms(source: Any, variables: Dict[str, str]) -> List[str]:
+    """
+    Resolve a source into a list of clean search terms.
+    Accepts strings (comma/semicolon-separated), lists, or other scalars.
+    Uses _resolve_placeholders to expand ${VAR} placeholders.
+    """
     resolved = _resolve_placeholders(source, variables)
     if not resolved:
         return []
@@ -61,6 +50,7 @@ def task_gather_documents(params: Dict[str, Any], context: Dict[str, Any]) -> st
     mission = context.get("mission")
     task_obj = context.get("task")
 
+    # Variables: prefer context-provided variables (TaskLogicHandler.build_execution_context already built them)
     variables = context.get("variables") or {}
 
     # Resolve workspace path
@@ -167,71 +157,78 @@ def task_gather_documents(params: Dict[str, Any], context: Dict[str, Any]) -> st
 
             try:
                 try:
-                    if guardrail_ref.is_sanctuary_path(str(file_path)):
+                    try:
+                        if guardrail_ref.is_sanctuary_path(str(file_path)):
+                            continue
+                    except AttributeError:
+                        pass
+
+                    relative_path = file_path.relative_to(workspace_path).as_posix()
+                    haystack = f"{filename.lower()} {relative_path.lower()}"
+
+                    if not any(term in haystack for term in search_terms_set):
                         continue
-                except AttributeError:
-                    pass
 
-                relative_path = file_path.relative_to(workspace_path).as_posix()
-                haystack = f"{filename.lower()} {relative_path.lower()}"
+                    # Read file content via file_manager (best-effort)
+                    try:
+                        content = file_manager_ref.read_file(str(file_path))
+                    except Exception:
+                        # fallback: try simple read
+                        try:
+                            with open(file_path, "r", encoding="utf-8") as fh:
+                                content = fh.read()
+                        except Exception as exc_read:
+                            errors.append(f"{relative_path}: {exc_read}")
+                            if context_bridge_ref:
+                                try:
+                                    context_bridge_ref.publish_diagnostic(
+                                        "task_gather_documents",
+                                        {
+                                            "event": "read_failed",
+                                            "document": relative_path,
+                                            "error": str(exc_read),
+                                        },
+                                    )
+                                except Exception:
+                                    logger.debug("Failed to publish read_failed", exc_info=True)
+                            continue
 
-                if not any(term in haystack for term in search_terms_set):
+                    gathered_docs.append({"path": relative_path, "content": content})
+                    if context_bridge_ref:
+                        try:
+                            context_bridge_ref.publish_diagnostic(
+                                "task_gather_documents",
+                                {
+                                    "event": "document_collected",
+                                    "document": relative_path,
+                                    "patterns": sorted(search_terms_set),
+                                    "count": len(gathered_docs),
+                                },
+                            )
+                        except Exception:
+                            logger.debug("Failed to publish document_collected", exc_info=True)
+
+                except Exception as exc_inner:  # pragma: no cover - instrumentation only
+                    message = f"{relative_path if 'relative_path' in locals() else file_path}: {exc_inner}"
+                    errors.append(message)
+                    if context_bridge_ref:
+                        try:
+                            context_bridge_ref.publish_diagnostic(
+                                "task_gather_documents",
+                                {
+                                    "event": "read_failed",
+                                    "document": relative_path if 'relative_path' in locals() else str(file_path),
+                                    "error": str(exc_inner),
+                                },
+                            )
+                        except Exception:
+                            logger.debug("Failed to publish read_failed (outer)", exc_info=True)
                     continue
 
-                # Read file content via file_manager (best-effort)
-                try:
-                    content = file_manager_ref.read_file(str(file_path))
-                except Exception:
-                    # fallback: try simple read
-                    try:
-                        with open(file_path, "r", encoding="utf-8") as fh:
-                            content = fh.read()
-                    except Exception as exc_read:
-                        errors.append(f"{relative_path}: {exc_read}")
-                        if context_bridge_ref:
-                            try:
-                                context_bridge_ref.publish_diagnostic(
-                                    "task_gather_documents",
-                                    {
-                                        "event": "read_failed",
-                                        "document": relative_path,
-                                        "error": str(exc_read),
-                                    },
-                                )
-                            except Exception:
-                                logger.debug("Failed to publish read_failed", exc_info=True)
-                        continue
-
-                gathered_docs.append({"path": relative_path, "content": content})
-                if context_bridge_ref:
-                    try:
-                        context_bridge_ref.publish_diagnostic(
-                            "task_gather_documents",
-                            {
-                                "event": "document_collected",
-                                "document": relative_path,
-                                "patterns": sorted(search_terms_set),
-                                "count": len(gathered_docs),
-                            },
-                        )
-                    except Exception:
-                        logger.debug("Failed to publish document_collected", exc_info=True)
-
-            except Exception as exc:  # pragma: no cover - instrumentation only
-                message = f"{relative_path if 'relative_path' in locals() else file_path}: {exc}"
+            except Exception as exc:  # safeguard outer loop
+                message = f"{file_path}: {exc}"
                 errors.append(message)
-                if context_bridge_ref:
-                    try:
-                        context_bridge_ref.publish_diagnostic(
-                            "task_gather_documents",
-                            {
-                                "event": "read_failed",
-                                "document": relative_path if 'relative_path' in locals() else str(file_path),
-                                "error": str(exc),
-                            },
-                        )
-                    except Exception:
-                        logger.debug("Failed to publish read_failed (outer)", exc_info=True)
+                logger.debug("Unexpected error while scanning %s: %s", file_path, exc, exc_info=True)
                 continue
 
     duration_seconds = (datetime.datetime.now() - start_timestamp).total_seconds()
