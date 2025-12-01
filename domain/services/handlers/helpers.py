@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional
 
 from core.file_manager import file_manager
 from core.guardrail import guardrail
+from core.context_bridge import context_bridge
 
 logger = logging.getLogger(__name__)
 
@@ -214,3 +215,61 @@ def _collect_variables(params: Optional[Dict[str, Any]], context_section: Option
             logger.debug("Failed to coerce variable source: %s", source, exc_info=True)
 
     return variables
+
+
+def build_execution_context(task, mission) -> Dict[str, Any]:
+    """
+    Build an execution context dict from a task and a mission.
+
+    Mirrors the original TaskLogicHandler._build_execution_context behaviour:
+    - merges variables from mission.context and task.parameters
+    - resolves placeholders for workspace/outpoints
+    - returns a dict containing workspace, workspace_path, variables, mode, output, declared_outputs,
+      context_meta and references to file_manager, guardrail and context_bridge.
+    """
+    metadata = getattr(mission, "metadata", {}) or {}
+    context_section = metadata.get("context") or {}
+    params = getattr(task, "parameters", {}) or {}
+
+    # collect variables (params override context_section)
+    variables = _collect_variables(params, context_section)
+
+    workspace_hint = (
+        params.get("workspace")
+        or params.get("workspace_path")
+        or context_section.get("workspace")
+        or context_section.get("workspace_path")
+        or metadata.get("workspace")
+    )
+
+    workspace_value = _resolve_placeholders(workspace_hint, variables)
+
+    if isinstance(workspace_value, (dict, list)):
+        workspace_value = None
+
+    workspace_candidate = str(workspace_value).strip() if workspace_value else "."
+    try:
+        workspace_path = Path(workspace_candidate).resolve()
+    except OSError:
+        workspace_path = Path(".").resolve()
+
+    declared_outputs = metadata.get("outputs") or []
+    declared_outputs = _resolve_placeholders(declared_outputs, variables)
+
+    output_config = params.get("output") or {}
+    output_config = _resolve_placeholders(output_config, variables)
+
+    return {
+        "task": task,
+        "mission": mission,
+        "workspace": str(workspace_path),
+        "workspace_path": workspace_path,
+        "variables": variables,
+        "mode": context_section.get("mode"),
+        "output": output_config,
+        "declared_outputs": declared_outputs,
+        "context_meta": context_section,
+        "file_manager": file_manager,
+        "guardrail": guardrail,
+        "context_bridge": context_bridge,
+    }
