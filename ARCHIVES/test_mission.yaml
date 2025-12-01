@@ -5,33 +5,31 @@ meta:
 
 tasks:
   - name: yaml_apply_dry_run
-    goal: Run yaml_replacer in dry run to verify replacement
-    module: yaml_apply
+    task_type: yaml_apply
     parameters:
       instructions:
         replacements:
           - file: "testsystemIAMcoder/example_widget.dart"
-            anchor: "const Text('Mettre à jour le cycle')"
-            after: "const Text('Mettre à jour le cycle — IAMcoder')"
+            anchor: "label: const Text('Mettre à jour le cycle')"
+            after: "label: const Text('Mettre à jour le cycle — IAMcoder')"
             include_anchor: false
       dry_run: true
+      output: "reports/last_report.json"
 
   - name: check_dry_run_report
-    goal: Verify dry run reported dry_run_ok
-    module: yaml_check_report
+    task_type: yaml_check_report
     parameters:
       report_path: "reports/last_report.json"
       expected_status: "dry_run_ok"
 
   - name: yaml_apply_live
-    goal: Apply replacement and create backup
-    module: yaml_apply
+    task_type: yaml_apply
     parameters:
       instructions:
         replacements:
           - file: "testsystemIAMcoder/example_widget.dart"
-            anchor: "const Text('Mettre à jour le cycle')"
-            after: "const Text('Mettre à jour le cycle — IAMcoder')"
+            anchor: "label: const Text('Mettre à jour le cycle')"
+            after: "label: const Text('Mettre à jour le cycle — IAMcoder')"
             include_anchor: false
       dry_run: false
       create_backup: true
