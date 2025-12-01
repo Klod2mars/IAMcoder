@@ -72,13 +72,10 @@ class TaskLogicHandler:
         elif task_name == "task_apply_writes" or ttype in {"task_apply_writes", "apply_writes"}:
             context = self._build_execution_context(task, mission)
             return task_apply_writes(params, context)
-<<<<<<< Updated upstream
-=======
         # YAML-driven deterministic replacer: apply replacements strictly as described in YAML
         elif ttype in {"yaml_replace", "yaml_apply", "yaml_apply_replacements"}:
             context = self._build_execution_context(task, mission)
             return apply_yaml_replacements(params, context)
->>>>>>> Stashed changes
         elif ttype == "setup":
             return f"[OK] Préparation du workspace : {params.get('variable_path', 'N/A')}"
         else:

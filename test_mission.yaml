@@ -1,5 +1,7 @@
 meta:
   project_name: IAMcoder
+  description: "Test replacement on example_widget.dart"
+  version: "1.0"
 
 tasks:
   - name: yaml_apply_dry_run
@@ -8,9 +10,9 @@ tasks:
     parameters:
       instructions:
         replacements:
-          - file: "testsystemIAMcoder/widget.dart"
-            anchor: "Text('Example Widget')"
-            after: "Text('Example Widget — IAMcoder')"
+          - file: "testsystemIAMcoder/example_widget.dart"
+            anchor: "const Text('Mettre à jour le cycle')"
+            after: "const Text('Mettre à jour le cycle — IAMcoder')"
             include_anchor: false
       dry_run: true
 
@@ -27,9 +29,10 @@ tasks:
     parameters:
       instructions:
         replacements:
-          - file: "testsystemIAMcoder/widget.dart"
-            anchor: "Text('Example Widget')"
-            after: "Text('Example Widget — IAMcoder')"
+          - file: "testsystemIAMcoder/example_widget.dart"
+            anchor: "const Text('Mettre à jour le cycle')"
+            after: "const Text('Mettre à jour le cycle — IAMcoder')"
             include_anchor: false
       dry_run: false
+      create_backup: true
       create_git_checkpoint: false
