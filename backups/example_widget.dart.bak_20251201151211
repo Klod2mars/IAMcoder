@@ -240,7 +240,7 @@ class PlantLifecycleWidget extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: onUpdateLifecycle,
         icon: const Icon(Icons.update),
-        label: const Text('Mettre à jour le cycle — IAMcoder'),
+        label: const Text('Mettre à jour le cycle'),
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 12),
         ),

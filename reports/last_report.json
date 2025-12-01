@@ -1,0 +1,13 @@
+{
+  "status": "applied",
+  "entries": [
+    {
+      "file": "testsystemIAMcoder/example_widget.dart",
+      "anchor": "label: const Text('Mettre à jour le cycle')",
+      "occurrences": 1,
+      "found": true,
+      "backup": "C:\\Users\\roman\\Documents\\apppklod\\aihomecoder\\backups\\example_widget.dart.bak_20251201151211",
+      "applied": true
+    }
+  ]
+}
