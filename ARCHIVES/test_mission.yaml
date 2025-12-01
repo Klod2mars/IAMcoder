@@ -5,6 +5,7 @@ meta:
 
 tasks:
   - name: yaml_apply_dry_run
+    goal: "Run yaml_replacer in dry run to verify replacement"
     task_type: yaml_apply
     parameters:
       instructions:
@@ -17,12 +18,14 @@ tasks:
       output: "reports/last_report.json"
 
   - name: check_dry_run_report
+    goal: "Verify dry run reported dry_run_ok"
     task_type: yaml_check_report
     parameters:
       report_path: "reports/last_report.json"
       expected_status: "dry_run_ok"
 
   - name: yaml_apply_live
+    goal: "Apply replacement and create backup"
     task_type: yaml_apply
     parameters:
       instructions:
