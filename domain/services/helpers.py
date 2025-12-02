@@ -19,7 +19,16 @@ def _resolve_placeholders(value: Any, variables: Dict[str, str]) -> Any:
     Returns the same structure with placeholders resolved where applicable.
     """
     if isinstance(value, str):
-        result = value
+        # Interprète les séquences d'échappement courantes fournies littéralement
+        # dans les YAML (ex: "\n", "\t", "\\") pour produire de vraies nouvelles lignes
+        # et tabulations dans le contenu écrit par IAMcoder.
+        try:
+            # decode les échappements de style Python/Unicode (\\n, \\t, \\uXXXX, ...)
+            decoded = value.encode('utf-8').decode('unicode_escape')
+        except Exception:
+            # en cas d'erreur (chaîne non décodable), retomber proprement sur l'original
+            decoded = value
+        return decoded
         for key, raw_val in (variables or {}).items():
             try:
                 result = result.replace(f"${{{key}}}", str(raw_val))
