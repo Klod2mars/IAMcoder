@@ -4,6 +4,7 @@ import json
 import datetime
 from typing import Any, Dict
 import logging
+import re
 
 from core.file_manager import file_manager
 from core.guardrail import guardrail
@@ -65,11 +66,59 @@ def apply_yaml_replacements(params: Dict[str, Any], context: Dict[str, Any]) -> 
             errors.append(str(e))
             continue
 
-        occ = content.count(anchor) if anchor else 0
-        entry["occurrences"] = occ
-        entry["found"] = occ > 0
+        # parameters
+        anchor_pattern = item.get("anchor_pattern") or anchor
+        use_regex = bool(item.get("anchor_regex")) or bool(item.get("anchor_pattern"))
+        case_insensitive = bool(item.get("case_insensitive", False))
+        ignore_indent = bool(item.get("ignore_indent", False))
+        replace_all = bool(item.get("replace_all", True))
+        occurrence = item.get("occurrence")  # optional: 1-based occurrence index
+        flags = 0
+        if case_insensitive:
+            flags |= re.IGNORECASE
+        if item.get("multiline", False):
+            flags |= re.MULTILINE
+        if item.get("dotall", False):
+            flags |= re.DOTALL
 
-        if occ and not dry_run:
+        matches = []
+        # Find matches according to mode
+        try:
+            if use_regex and anchor_pattern:
+                pattern = re.compile(anchor_pattern, flags)
+                for m in pattern.finditer(content):
+                    matches.append((m.start(), m.end(), m.group(0)))
+            elif anchor:
+                if ignore_indent:
+                    # match anchor ignoring leading indentation
+                    pattern = re.compile(r'^[ \t]*' + re.escape(anchor), re.MULTILINE)
+                    for m in pattern.finditer(content):
+                        matches.append((m.start(), m.end(), m.group(0)))
+                else:
+                    # simple substring search (all occurrences)
+                    start_idx = 0
+                    while True:
+                        idx = content.find(anchor, start_idx)
+                        if idx == -1:
+                            break
+                        matches.append((idx, idx + len(anchor), content[idx:idx + len(anchor)]))
+                        start_idx = idx + len(anchor)
+        except re.error as e:
+            entry["error"] = f"anchor_pattern_error: {str(e)}"
+            report["entries"].append(entry)
+            continue
+
+        entry["occurrences"] = len(matches)
+        entry["found"] = len(matches) > 0
+        # include small diagnostics about matches (first 5)
+        entry["matches"] = []
+        for s, e, sn in matches[:5]:
+            ctx_s = max(0, s - 30)
+            ctx_e = min(len(content), e + 30)
+            snippet = content[ctx_s:ctx_e].replace("\n", "\\n")
+            entry["matches"].append({"start": s, "end": e, "snippet": snippet})
+
+        if matches and not dry_run:
             try:
                 # create backup if requested
                 if create_backup:
@@ -81,17 +130,84 @@ def apply_yaml_replacements(params: Dict[str, Any], context: Dict[str, Any]) -> 
                     fm.write_file(str(backup_path), content)
                     entry["backup"] = str(backup_path)
 
-                # apply replacement
-                if include_anchor:
-                    new_content = content.replace(anchor, anchor + after)
+                new_content = content
+
+                if use_regex and anchor_pattern:
+                    # regex replacement
+                    if include_anchor:
+                        repl = lambda m: m.group(0) + after
+                    else:
+                        repl = after
+                    if replace_all:
+                        new_content, n = pattern.subn(repl, new_content)
+                    else:
+                        # replace only the specified occurrence or the first one
+                        count = 1
+                        if occurrence:
+                            # perform replacement of the specific occurrence
+                            occ_index = int(occurrence) - 1
+                            # iterate matches to reconstruct result
+                            parts = []
+                            last = 0
+                            replaced = 0
+                            for i, m in enumerate(pattern.finditer(new_content)):
+                                if i == occ_index:
+                                    parts.append(new_content[last:m.start()])
+                                    if include_anchor:
+                                        parts.append(m.group(0) + after)
+                                    else:
+                                        parts.append(after)
+                                    last = m.end()
+                                    replaced = 1
+                                    break
+                            if replaced:
+                                parts.append(new_content[last:])
+                                new_content = "".join(parts)
+                                n = replaced
+                            else:
+                                n = 0
+                        else:
+                            new_content, n = pattern.subn(repl, new_content, count=1)
                 else:
-                    new_content = content.replace(anchor, after)
+                    # simple substring replacement
+                    if include_anchor:
+                        if replace_all:
+                            new_content = new_content.replace(anchor, anchor + after)
+                            n = entry["occurrences"]
+                        else:
+                            if occurrence:
+                                new_content = new_content.replace(anchor, anchor + after, 1)  # simplest: replace first occurrence only
+                                n = 1
+                            else:
+                                new_content = new_content.replace(anchor, anchor + after, 1)
+                                n = 1
+                    else:
+                        if replace_all:
+                            new_content = new_content.replace(anchor, after)
+                            n = entry["occurrences"]
+                        else:
+                            new_content = new_content.replace(anchor, after, 1)
+                            n = 1
 
                 fm.write_file(str(target_path), new_content)
                 entry["applied"] = True
+                entry["applied_matches"] = n
             except Exception as e:
                 entry["error"] = f"apply_error: {str(e)}"
                 errors.append(str(e))
+
+        # if no matches, optionally add a suggestion
+        if not matches:
+            # simple suggestion: try ignore_indent or case_insensitive or regex
+            sug = []
+            if not ignore_indent:
+                sug.append("try 'ignore_indent: true'")
+            if not case_insensitive:
+                sug.append("try 'case_insensitive: true'")
+            if not use_regex:
+                sug.append("or use 'anchor_pattern' (regex) to match variants)")
+            if sug:
+                entry.setdefault("suggestions", []).append(", ".join(sug))
 
         report["entries"].append(entry)
 
